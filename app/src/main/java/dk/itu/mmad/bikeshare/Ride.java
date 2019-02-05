@@ -1,4 +1,4 @@
-package com.example.bikeshare;
+package dk.itu.mmad.bikeshare;
 
 public class Ride {
 

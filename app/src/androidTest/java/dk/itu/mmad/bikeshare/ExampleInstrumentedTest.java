@@ -1,4 +1,4 @@
-package com.example.bikeshare;
+package dk.itu.mmad.bikeshare;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
