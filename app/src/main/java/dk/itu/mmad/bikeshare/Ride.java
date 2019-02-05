@@ -4,10 +4,12 @@ public class Ride {
 
     private String mBikeName;
     private String mStartRide;
+    private String mEndRide;
 
-    public Ride(String bikeName, String startRide) {
+    public Ride(String bikeName, String startRide, String endRide) {
         mBikeName = bikeName;
         mStartRide = startRide;
+        mEndRide = endRide;
     }
 
     public String getBikeName() {
@@ -26,8 +28,16 @@ public class Ride {
         mStartRide = startRide;
     }
 
+    public String getEndRide() {
+        return mEndRide;
+    }
+
+    public void setEndRide(String endRide) {
+        mEndRide = endRide;
+    }
+
     public String toString() {
-        return mBikeName + " started here: " + mStartRide;
+        return mBikeName + " started here: " + mStartRide + " and ended here: " + mEndRide;
     }
 
 }

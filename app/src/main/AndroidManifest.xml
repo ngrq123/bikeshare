@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.bikeshare" >
+    package="dk.itu.mmad.bikeshare">
 
     <application
         android:allowBackup="true"
@@ -8,8 +8,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme" >
-        <activity android:name="dk.itu.mmad.bikeshare.BikeShareActivity" >
+        android:theme="@style/AppTheme">
+        <activity android:name="dk.itu.mmad.bikeshare.EndRideActivity"></activity>
+        <activity android:name="dk.itu.mmad.bikeshare.StartRideActivity" />
+        <activity android:name="dk.itu.mmad.bikeshare.BikeShareActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
