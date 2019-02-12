@@ -6,7 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.List;
 
 import dk.itu.mmad.bikeshare.R;
 
@@ -17,6 +20,10 @@ public class BikeShareActivity extends AppCompatActivity {
     private Button mEndRide;
 
     private Ride mLast = new Ride("", "", "");
+
+    private static RidesDB sRidesDB;
+    private RideArrayAdaptor mAdaptor;
+    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,5 +51,13 @@ public class BikeShareActivity extends AppCompatActivity {
             }
         });
 
+        // Singleton to share an object between the app activities
+        sRidesDB = RidesDB.get(this);
+        List<Ride> values = sRidesDB.getRidesDB();
+
+        // Create the adaptor
+        mAdaptor = new RideArrayAdaptor(this, values);
+        mListView = (ListView) findViewById(R.id.main_list_view);
+        mListView.setAdapter(mAdaptor);
     }
 }

@@ -16,4 +16,16 @@
         android:layout_height="wrap_content"
         android:text="End ride" />
 
+    <Button
+        android:id="@+id/end_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="List rides" />
+
+    <ListView
+        android:id="@+id/main_list_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="12sp" />
+
 </LinearLayout>
