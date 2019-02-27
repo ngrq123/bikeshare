@@ -17,7 +17,7 @@
         android:text="End ride" />
 
     <Button
-        android:id="@+id/end_button"
+        android:id="@+id/list_ride_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="List rides" />

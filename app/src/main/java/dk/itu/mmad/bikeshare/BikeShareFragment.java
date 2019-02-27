@@ -16,8 +16,7 @@ public class BikeShareFragment extends Fragment {
     private Button mAddRide;
     private Button mEndRide;
 
-    private Ride mLast = new Ride("", "", "");
-
+    // Singleton, adaptor and list view variables
     private static RidesDB sRidesDB;
     private RideArrayAdaptor mAdaptor;
     private ListView mListView;
@@ -56,14 +55,11 @@ public class BikeShareFragment extends Fragment {
         mListView.setAdapter(mAdaptor);
 
         return v;
-
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_bike_share);
-
     }
 
 

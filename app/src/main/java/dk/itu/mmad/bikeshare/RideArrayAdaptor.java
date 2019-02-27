@@ -28,9 +28,9 @@ public class RideArrayAdaptor extends ArrayAdapter<Ride> {
         TextView bikeView = (TextView) rowView.findViewById(R.id.what_bike_ride);
         bikeView.append(mValues.get(position).getBikeName());
         TextView startView = (TextView) rowView.findViewById(R.id.start_ride);
-        bikeView.append(mValues.get(position).getStartRide());
+        startView.append(mValues.get(position).getStartRide());
         TextView endView = (TextView) rowView.findViewById(R.id.end_ride);
-        bikeView.append(mValues.get(position).getEndRide());
+        endView.append(mValues.get(position).getEndRide());
         return rowView;
     }
 

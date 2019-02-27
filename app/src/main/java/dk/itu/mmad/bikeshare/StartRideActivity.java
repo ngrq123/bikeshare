@@ -16,8 +16,8 @@ public class StartRideActivity extends AppCompatActivity {
     private TextView mLastAdded;
     private TextView mNewWhat;
     private TextView mNewWhere;
-//    private TextView mBuildVersion;
 
+    // Last ride information
     private Ride mLast = new Ride("", "", "");
 
     @Override
@@ -50,10 +50,6 @@ public class StartRideActivity extends AppCompatActivity {
                 }
             }
         });
-
-//        mBuildVersion = (TextView) findViewById(R.id.build_version);
-//        mBuildVersion.setText("API level " + Build.VERSION.SDK_INT);
-
     }
 
     private void updateUI() {

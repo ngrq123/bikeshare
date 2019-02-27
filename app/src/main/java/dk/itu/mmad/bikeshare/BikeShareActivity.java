@@ -4,20 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.ListView;
 
 public class BikeShareActivity extends AppCompatActivity {
-
-    // GUI variables
-    private Button mAddRide;
-    private Button mEndRide;
-
-    private Ride mLast = new Ride("", "", "");
-
-    private static RidesDB sRidesDB;
-    private RideArrayAdaptor mAdaptor;
-    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +21,5 @@ public class BikeShareActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
-
     }
 }
