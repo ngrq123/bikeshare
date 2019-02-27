@@ -1,13 +1,10 @@
 package dk.itu.mmad.bikeshare;
 
-import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import dk.itu.mmad.bikeshare.R;
 
 public class EndRideActivity extends AppCompatActivity {
 

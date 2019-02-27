@@ -1,6 +1,7 @@
 package dk.itu.mmad.bikeshare;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ public class BikeShareFragment extends Fragment {
     // GUI variables
     private Button mAddRide;
     private Button mEndRide;
+    private TextView mBuildVersion;
 
     // Singleton, adaptor and list view variables
     private static RidesDB sRidesDB;
@@ -53,6 +56,10 @@ public class BikeShareFragment extends Fragment {
         mAdaptor = new RideArrayAdaptor(getContext(), values);
         mListView = (ListView) v.findViewById(R.id.main_list_view);
         mListView.setAdapter(mAdaptor);
+
+        // Show build version
+        mBuildVersion = (TextView) v.findViewById(R.id.build_version);
+        mBuildVersion.setText("API level " + Build.VERSION.SDK_INT);
 
         return v;
     }
