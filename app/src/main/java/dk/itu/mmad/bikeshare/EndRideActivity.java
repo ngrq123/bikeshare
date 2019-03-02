@@ -10,7 +10,7 @@ public class EndRideActivity extends AppCompatActivity {
 
     // GUI variables
     private Button mEndRide;
-    private TextView mLastAdded;
+    private TextView mLastEnded;
     private TextView mNewWhat;
     private TextView mNewWhere;
 
@@ -22,7 +22,7 @@ public class EndRideActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_end_ride);
 
-        mLastAdded = (TextView) findViewById(R.id.last_ride);
+        mLastEnded = (TextView) findViewById(R.id.last_ride);
         updateUI();
 
         // Button
@@ -38,7 +38,10 @@ public class EndRideActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (mNewWhat.getText().length() > 0 && mNewWhere.getText().length() > 0) {
                     mLast.setBikeName(mNewWhat.getText().toString().trim());
-                    mLast.setStartRide(mNewWhere.getText().toString().trim());
+                    mLast.setEndRide(mNewWhere.getText().toString().trim());
+
+                    RidesDB.get(view.getContext())
+                            .endRide(mNewWhat.getText().toString(), mNewWhere.getText().toString());
 
                     // Reset text fields
                     mNewWhat.setText("");
@@ -51,9 +54,9 @@ public class EndRideActivity extends AppCompatActivity {
 
     private void updateUI() {
         if (mLast.getBikeName().isEmpty() && mLast.getStartRide().isEmpty()) {
-            mLastAdded.setText("");
+            mLastEnded.setText("");
         } else {
-            mLastAdded.setText(mLast.toString());
+            mLastEnded.setText(mLast.toString());
         }
     }
 }

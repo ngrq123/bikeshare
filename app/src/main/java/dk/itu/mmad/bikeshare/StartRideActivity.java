@@ -40,6 +40,9 @@ public class StartRideActivity extends AppCompatActivity {
                     mLast.setBikeName(mNewWhat.getText().toString().trim());
                     mLast.setStartRide(mNewWhere.getText().toString().trim());
 
+                    RidesDB.get(view.getContext())
+                            .addRide(mNewWhat.getText().toString(), mNewWhere.getText().toString());
+
                     // Reset text fields
                     mNewWhat.setText("");
                     mNewWhere.setText("");

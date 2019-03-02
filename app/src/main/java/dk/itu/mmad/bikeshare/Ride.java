@@ -37,7 +37,21 @@ public class Ride {
     }
 
     public String toString() {
-        return mBikeName + " started here: " + mStartRide + " and ended here: " + mEndRide;
+        String rideStr = mBikeName;
+
+        if (!mStartRide.equals("")) {
+            rideStr += " started here: " + mStartRide;
+        }
+
+        if (!mStartRide.equals("") && !mEndRide.equals("")) {
+            rideStr += " and";
+        }
+
+        if (!mEndRide.equals("")) {
+            rideStr += " ended here: " + mEndRide;
+        }
+
+        return rideStr;
     }
 
 }

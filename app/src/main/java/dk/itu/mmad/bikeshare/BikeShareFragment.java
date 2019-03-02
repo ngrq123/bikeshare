@@ -18,7 +18,7 @@ import android.widget.Toast;
 import java.util.List;
 
 public class BikeShareFragment extends Fragment {
-    // Logger variable
+    // Logging variable
     private static final String TAG = "BikeShareFragment";
 
     // Intent variable
@@ -43,6 +43,13 @@ public class BikeShareFragment extends Fragment {
         mEndRide = (Button) v.findViewById(R.id.end_button);
         mListRides = (Button) v.findViewById(R.id.list_rides_button);
 
+        // Singleton to share an object between the app activities
+        sRidesDB = RidesDB.get(getContext());
+        final List<Ride> values = sRidesDB.getRidesDB();
+
+        // Create the adaptor
+        mAdaptor = new RideArrayAdaptor(getContext(), values);
+
         // Click events
         mAddRide.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,12 +71,7 @@ public class BikeShareFragment extends Fragment {
         mBuildVersion = (TextView) v.findViewById(R.id.build_version);
         mBuildVersion.setText("API level " + Build.VERSION.SDK_INT);
 
-        // Singleton to share an object between the app activities
-        sRidesDB = RidesDB.get(getContext());
-        final List<Ride> values = sRidesDB.getRidesDB();
-
-        // Create the adaptor
-        mAdaptor = new RideArrayAdaptor(getContext(), values);
+        // Create list view
         mListView = (ListView) v.findViewById(R.id.main_list_view);
 
         mListRides.setOnClickListener(new View.OnClickListener() {
@@ -94,8 +96,6 @@ public class BikeShareFragment extends Fragment {
 
         Intent intent = getActivity().getIntent();
 
-        Log.d(TAG, getActivity().toString());
-
         if (intent != null) {
             int position = intent.getIntExtra(EXTRA_POSITION, -1);
             if (position != -1) {
@@ -116,7 +116,6 @@ public class BikeShareFragment extends Fragment {
 
                 Toast toast = Toast.makeText(getContext(), toastMessage, Toast.LENGTH_LONG);
                 toast.show();
-//                mAdaptor.notifyDataSetChanged();
             }
         }
 
@@ -124,9 +123,15 @@ public class BikeShareFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (mAdaptor != null) {
+            mAdaptor.notifyDataSetChanged();
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-
-
 }

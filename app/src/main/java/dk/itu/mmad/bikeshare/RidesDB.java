@@ -1,11 +1,14 @@
 package dk.itu.mmad.bikeshare;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RidesDB {
+    // Logging variable
+    private static final String TAG = "RidesDB";
 
     private static RidesDB sRidesDB;
     private ArrayList<Ride> mAllRides;
@@ -36,9 +39,9 @@ public class RidesDB {
     }
 
     public void addRide(String what, String where) {
-        mLastRide.setBikeName(what);
-        mLastRide.setStartRide(where);
-        mAllRides.add(mLastRide);
+        Ride ride = new Ride(what, where, "");
+        mAllRides.add(ride);
+        mLastRide = ride;
     }
 
     public void endRide(String what, String where) {
@@ -46,6 +49,16 @@ public class RidesDB {
                 mLastRide.getEndRide().equals("")) {
             mLastRide.setEndRide(where);
             mLastRide = new Ride("", "", "");
+        } else {
+            boolean isUpdated = false;
+            for (int idx = mAllRides.size()-1; !isUpdated && idx >= 0; idx--) {
+                Ride ride = mAllRides.get(idx);
+                if (ride.getBikeName().equals(what) &&
+                        ride.getEndRide().equals("")) {
+                    ride.setEndRide(where);
+                    isUpdated = true;
+                }
+            }
         }
     }
 
