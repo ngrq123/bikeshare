@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -17,6 +18,7 @@ public class BikeShareFragment extends Fragment {
     // GUI variables
     private Button mAddRide;
     private Button mEndRide;
+    private Button mListRides;
     private TextView mBuildVersion;
 
     // Singleton, adaptor and list view variables
@@ -27,9 +29,10 @@ public class BikeShareFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedBundleState) {
         View v = inflater.inflate(R.layout.fragment_bike_share, container, false);
-        // Button
+        // Buttons
         mAddRide = (Button) v.findViewById(R.id.add_button);
         mEndRide = (Button) v.findViewById(R.id.end_button);
+        mListRides = (Button) v.findViewById(R.id.list_rides_button);
 
         // Click events
         mAddRide.setOnClickListener(new View.OnClickListener() {
@@ -50,12 +53,31 @@ public class BikeShareFragment extends Fragment {
 
         // Singleton to share an object between the app activities
         sRidesDB = RidesDB.get(getContext());
-        List<Ride> values = sRidesDB.getRidesDB();
+        final List<Ride> values = sRidesDB.getRidesDB();
 
         // Create the adaptor
         mAdaptor = new RideArrayAdaptor(getContext(), values);
         mListView = (ListView) v.findViewById(R.id.main_list_view);
-        mListView.setAdapter(mAdaptor);
+
+        mListRides.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if (mListView.getAdapter() == null) {
+                    mListView.setAdapter(mAdaptor);
+
+                    mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            Intent intent = RideDetailActivity.newIntent(getContext(), values.get(i));
+                            startActivity(intent);
+                        }
+                    });
+                } else {
+                    mListView.setAdapter(null);
+                }
+            }
+        });
 
         // Show build version
         mBuildVersion = (TextView) v.findViewById(R.id.build_version);
