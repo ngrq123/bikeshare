@@ -32,7 +32,7 @@ public class EndRideActivity extends AppCompatActivity {
         mNewWhat = (TextView) findViewById(R.id.what_text);
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
-        // View products click event
+        // End ride click event
         mEndRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

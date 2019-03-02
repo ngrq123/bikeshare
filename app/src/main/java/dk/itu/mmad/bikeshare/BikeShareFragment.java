@@ -1,9 +1,11 @@
 package dk.itu.mmad.bikeshare;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +13,17 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
 public class BikeShareFragment extends Fragment {
+    // Logger variable
+    private static final String TAG = "BikeShareFragment";
+
+    // Intent variable
+    private static String EXTRA_POSITION = "dk.itu.mmad.bikeshare.EXTRA_POSITION";
+
     // GUI variables
     private Button mAddRide;
     private Button mEndRide;
@@ -51,6 +60,10 @@ public class BikeShareFragment extends Fragment {
             }
         });
 
+        // Show build version
+        mBuildVersion = (TextView) v.findViewById(R.id.build_version);
+        mBuildVersion.setText("API level " + Build.VERSION.SDK_INT);
+
         // Singleton to share an object between the app activities
         sRidesDB = RidesDB.get(getContext());
         final List<Ride> values = sRidesDB.getRidesDB();
@@ -69,7 +82,7 @@ public class BikeShareFragment extends Fragment {
                     mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                            Intent intent = RideDetailActivity.newIntent(getContext(), values.get(i));
+                            Intent intent = RideDetailActivity.newIntent(getContext(), values.get(i), i);
                             startActivity(intent);
                         }
                     });
@@ -79,9 +92,33 @@ public class BikeShareFragment extends Fragment {
             }
         });
 
-        // Show build version
-        mBuildVersion = (TextView) v.findViewById(R.id.build_version);
-        mBuildVersion.setText("API level " + Build.VERSION.SDK_INT);
+        Intent intent = getActivity().getIntent();
+
+        Log.d(TAG, getActivity().toString());
+
+        if (intent != null) {
+            int position = intent.getIntExtra(EXTRA_POSITION, -1);
+            if (position != -1) {
+
+                // Get deleted ride for toast and delete ride
+                Ride mDeletedRide = values.get(position);
+                sRidesDB.deleteRide(position);
+
+                // Set toast message
+                String toastMessage = "The " + mDeletedRide.getBikeName() +
+                        " ride that started from " + mDeletedRide.getStartRide();
+
+                if (mDeletedRide.getEndRide().equals("")) {
+                    toastMessage +=  " has been deleted";
+                } else {
+                    toastMessage += " to " + mDeletedRide.getEndRide() + " has been deleted";
+                }
+
+                Toast toast = Toast.makeText(getContext(), toastMessage, Toast.LENGTH_LONG);
+                toast.show();
+//                mAdaptor.notifyDataSetChanged();
+            }
+        }
 
         return v;
     }

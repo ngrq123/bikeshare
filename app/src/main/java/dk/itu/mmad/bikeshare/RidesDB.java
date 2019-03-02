@@ -49,4 +49,8 @@ public class RidesDB {
         }
     }
 
+    public void deleteRide(int position) {
+        mAllRides.remove(position);
+    }
+
 }
