@@ -5,62 +5,65 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:padding="24dp"
-            android:text="Bike Name" />
+            android:text="Bike Name"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/bike_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="24dp" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:padding="24dp"
-            android:text="Start ride" />
+            android:text="Start Ride"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/start_ride"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="24dp" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
     <LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_marginBottom="5dp"
-    android:orientation="horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="25dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="horizontal">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:padding="24dp"
-            android:text="End ride" />
+            android:text="End Ride"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/end_ride"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="24dp" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
@@ -72,6 +75,7 @@
         android:id="@+id/delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_light"
         android:text="Delete ride" />
 
 </LinearLayout>
