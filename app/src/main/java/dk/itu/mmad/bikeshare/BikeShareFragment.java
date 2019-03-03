@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +34,7 @@ public class BikeShareFragment extends Fragment {
     // Singleton, adaptor and list view variables
     private static RidesDB sRidesDB;
     private RideArrayAdaptor mAdaptor;
+    private View mListViewDivider;
     private ListView mListView;
 
     @Override
@@ -71,7 +73,10 @@ public class BikeShareFragment extends Fragment {
         mBuildVersion = (TextView) v.findViewById(R.id.build_version);
         mBuildVersion.setText("API level " + Build.VERSION.SDK_INT);
 
-        // Create list view
+        // Create list view with divider
+        mListViewDivider = (View) v.findViewById(R.id.main_list_view_divider);
+        mListViewDivider.setVisibility(LinearLayout.GONE);
+
         mListView = (ListView) v.findViewById(R.id.main_list_view);
 
         mListRides.setOnClickListener(new View.OnClickListener() {
@@ -79,6 +84,7 @@ public class BikeShareFragment extends Fragment {
             public void onClick(View view) {
 
                 if (mListView.getAdapter() == null) {
+                    mListViewDivider.setVisibility(LinearLayout.VISIBLE);
                     mListView.setAdapter(mAdaptor);
 
                     mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
@@ -89,6 +95,7 @@ public class BikeShareFragment extends Fragment {
                         }
                     });
                 } else {
+                    mListViewDivider.setVisibility(LinearLayout.GONE);
                     mListView.setAdapter(null);
                 }
             }
