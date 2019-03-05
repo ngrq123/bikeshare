@@ -6,6 +6,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 public class StartRideActivity extends AppCompatActivity {
 
     // GUI variables
@@ -15,7 +19,7 @@ public class StartRideActivity extends AppCompatActivity {
     private TextView mNewWhere;
 
     // Last ride information
-    private Ride mLast = new Ride("", "", "");
+    private Ride mLast = new Ride("", "", null, "", null);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,11 +41,16 @@ public class StartRideActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (mNewWhat.getText().length() > 0 && mNewWhere.getText().length() > 0) {
-                    mLast.setBikeName(mNewWhat.getText().toString().trim());
-                    mLast.setStartRide(mNewWhere.getText().toString().trim());
+                    String bikeName = mNewWhat.getText().toString().trim();
+                    String startRide = mNewWhere.getText().toString().trim();
+                    Date startDate = Calendar.getInstance().getTime();
+
+                    mLast.setBikeName(bikeName);
+                    mLast.setStartRide(startRide);
+                    mLast.setStartDate(startDate);
 
                     RidesDB.get(view.getContext())
-                            .addRide(mNewWhat.getText().toString(), mNewWhere.getText().toString());
+                            .addRide(bikeName, startRide, startDate);
 
                     // Reset text fields
                     mNewWhat.setText("");
