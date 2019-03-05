@@ -29,13 +29,13 @@
         android:id="@+id/build_version" />
 
     <View
-        android:id="@+id/main_list_view_divider"
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@android:color/darker_gray"/>
 
-    <ListView
-        android:id="@+id/main_list_view"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/main_recycler_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="12sp" />

@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,9 +35,9 @@ public class BikeShareFragment extends Fragment {
 
     // Singleton, adaptor and list view variables
     private static RidesDB sRidesDB;
-    private RideArrayAdaptor mAdaptor;
-    private View mListViewDivider;
-    private ListView mListView;
+    private RideAdaptor mAdaptor;
+    private View mDivider;
+    private RecyclerView mRecyclerView;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedBundleState) {
@@ -47,10 +49,10 @@ public class BikeShareFragment extends Fragment {
 
         // Singleton to share an object between the app activities
         sRidesDB = RidesDB.get(getContext());
-        final List<Ride> values = sRidesDB.getRidesDB();
+        final List<Ride> rides = sRidesDB.getRidesDB();
 
         // Create the adaptor
-        mAdaptor = new RideArrayAdaptor(getContext(), values);
+        mAdaptor = new RideAdaptor(rides);
 
         // Click events
         mAddRide.setOnClickListener(new View.OnClickListener() {
@@ -74,29 +76,30 @@ public class BikeShareFragment extends Fragment {
         mBuildVersion.setText("API level " + Build.VERSION.SDK_INT);
 
         // Create list view with divider
-        mListViewDivider = (View) v.findViewById(R.id.main_list_view_divider);
-        mListViewDivider.setVisibility(LinearLayout.GONE);
+        mDivider = (View) v.findViewById(R.id.divider);
+        mDivider.setVisibility(LinearLayout.GONE);
 
-        mListView = (ListView) v.findViewById(R.id.main_list_view);
+        mRecyclerView = (RecyclerView) v.findViewById(R.id.main_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         mListRides.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if (mListView.getAdapter() == null) {
-                    mListViewDivider.setVisibility(LinearLayout.VISIBLE);
-                    mListView.setAdapter(mAdaptor);
+                if (mRecyclerView.getAdapter() == null) {
+                    mDivider.setVisibility(LinearLayout.VISIBLE);
+                    mRecyclerView.setAdapter(mAdaptor);
 
-                    mListView.setOnItemClickListener(new ListView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                            Intent intent = RideDetailActivity.newIntent(getContext(), values.get(i), i);
-                            startActivity(intent);
-                        }
-                    });
+//                    mRecyclerView.setOnItemClickListener(new ListView.OnItemClickListener() {
+//                        @Override
+//                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+//                            Intent intent = RideDetailActivity.newIntent(getContext(), values.get(i), i);
+//                            startActivity(intent);
+//                        }
+//                    });
                 } else {
-                    mListViewDivider.setVisibility(LinearLayout.GONE);
-                    mListView.setAdapter(null);
+                    mDivider.setVisibility(LinearLayout.GONE);
+                    mRecyclerView.setAdapter(null);
                 }
             }
         });
@@ -108,7 +111,7 @@ public class BikeShareFragment extends Fragment {
             if (position != -1) {
 
                 // Get deleted ride for toast and delete ride
-                Ride mDeletedRide = values.get(position);
+                Ride mDeletedRide = rides.get(position);
                 sRidesDB.deleteRide(position);
 
                 // Set toast message
