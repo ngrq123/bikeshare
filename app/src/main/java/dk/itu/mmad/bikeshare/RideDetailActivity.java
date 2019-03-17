@@ -1,5 +1,6 @@
 package dk.itu.mmad.bikeshare;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -10,10 +11,7 @@ import android.widget.TextView;
 
 public class RideDetailActivity extends AppCompatActivity {
 
-    private static final String EXTRA_BIKE_NAME = "dk.itu.mmad.bikeshare.bike_name";
-    private static final String EXTRA_START_RIDE = "dk.itu.mmad.bikeshare.start_ride";
-    private static final String EXTRA_END_RIDE = "dk.itu.mmad.bikeshare.end_ride";
-    private static final String EXTRA_POSITION = "dk.itu.mmad.bikeshare.position";
+    private static final String EXTRA_ID = "dk.itu.mmad.bikeshare.id";
 
     private TextView mBikeName;
     private TextView mStartRide;
@@ -21,12 +19,12 @@ public class RideDetailActivity extends AppCompatActivity {
 
     private Button mDeleteRide;
 
-    public static Intent newIntent(Context packageContext, Ride ride, int position) {
+    // Singleton
+    private RideViewModel mRideViewModel;
+
+    public static Intent newIntent(Context packageContext, Ride ride) {
         Intent intent = new Intent(packageContext, RideDetailActivity.class);
-        intent.putExtra(EXTRA_BIKE_NAME, ride.getBikeName());
-        intent.putExtra(EXTRA_START_RIDE, ride.getStartRide());
-        intent.putExtra(EXTRA_END_RIDE, ride.getEndRide());
-        intent.putExtra(EXTRA_POSITION, position);
+        intent.putExtra(EXTRA_ID, ride.getId());
         return intent;
     }
 
@@ -43,20 +41,29 @@ public class RideDetailActivity extends AppCompatActivity {
         // Button
         mDeleteRide = (Button) findViewById(R.id.delete_button);
 
-        // Set texts
-        mBikeName.setText(getIntent().getStringExtra(EXTRA_BIKE_NAME));
-        mStartRide.setText(getIntent().getStringExtra(EXTRA_START_RIDE));
-        mEndRide.setText(getIntent().getStringExtra(EXTRA_END_RIDE));
+        // Singleton to share an object between the app activities
+        mRideViewModel = ViewModelProviders.of(this).get(RideViewModel.class);
 
-        // Delete ride click event
-        mDeleteRide.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int position = getIntent().getIntExtra(EXTRA_POSITION, -1);
-                Intent intent = BikeShareActivity.newIntent(RideDetailActivity.this, position);
-                startActivity(intent);
-            }
-        });
+        int rideId = getIntent().getIntExtra(EXTRA_ID, -1);
+
+        if (rideId != -1) {
+            final Ride ride = mRideViewModel.getRide(rideId);
+
+            // Set texts
+            mBikeName.setText(ride.getBikeName());
+            mStartRide.setText(ride.getStartRide());
+            mEndRide.setText(ride.getEndRide());
+
+            // Delete ride click event
+            mDeleteRide.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mRideViewModel.delete(ride);
+                    Intent intent = BikeShareActivity.newIntent(RideDetailActivity.this, ride.toString());
+                    startActivity(intent);
+                }
+            });
+        }
 
     }
 }

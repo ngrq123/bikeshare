@@ -1,5 +1,8 @@
 package dk.itu.mmad.bikeshare;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +20,9 @@ public class StartRideActivity extends AppCompatActivity {
     private TextView mLastAdded;
     private TextView mNewWhat;
     private TextView mNewWhere;
+
+    // Singleton
+    private RideViewModel mRideViewModel;
 
     // Last ride information
     private Ride mLast = new Ride("", "", null, "", null);
@@ -36,6 +42,9 @@ public class StartRideActivity extends AppCompatActivity {
         mNewWhat = (TextView) findViewById(R.id.what_text);
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
+        // Singleton to share an object between the app activities
+        mRideViewModel = ViewModelProviders.of(this).get(RideViewModel.class);
+
         // Add ride click event
         mAddRide.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,8 +58,7 @@ public class StartRideActivity extends AppCompatActivity {
                     mLast.setStartRide(startRide);
                     mLast.setStartDate(startDate);
 
-                    RidesDB.get(view.getContext())
-                            .addRide(bikeName, startRide, startDate);
+                    mRideViewModel.insert(mLast);
 
                     // Reset text fields
                     mNewWhat.setText("");
@@ -59,6 +67,8 @@ public class StartRideActivity extends AppCompatActivity {
                 }
             }
         });
+
+
     }
 
     private void updateUI() {

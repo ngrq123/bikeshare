@@ -1,40 +1,55 @@
 package dk.itu.mmad.bikeshare;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RideAdaptor extends RecyclerView.Adapter<RideHolder> {
+    // Logging variable
+    private static final String TAG = "RideAdaptor";
 
-    private final List<Ride> mRides;
+    private final LayoutInflater mInflater;
+    private List<Ride> mAllRides;
 
-    public RideAdaptor(List<Ride> rides) {
-        mRides = rides;
-    }
-
-    @NonNull
-    @Override
-    public RideHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        return new RideHolder(layoutInflater, parent);
+    public RideAdaptor(Context context) {
+        mInflater = LayoutInflater.from(context);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RideHolder holder, final int position) {
-        Ride ride = mRides.get(position);
-        holder.bind(ride);
+    public RideHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = mInflater.inflate(R.layout.list_item_ride, parent, false);
+        return new RideHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(RideHolder holder, int position) {
+        if (mAllRides != null) {
+            Ride ride = mAllRides.get(position);
+            holder.bind(ride);
+        }
+    }
+
+    public void setRides(List<Ride> rides){
+        mAllRides = rides;
+        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() {
-        return mRides.size();
+        if (mAllRides != null) {
+            return mAllRides.size();
+        }
+        return 0;
     }
 }

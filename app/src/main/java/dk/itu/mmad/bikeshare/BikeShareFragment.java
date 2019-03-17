@@ -1,20 +1,24 @@
 package dk.itu.mmad.bikeshare;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +29,7 @@ public class BikeShareFragment extends Fragment {
     private static final String TAG = "BikeShareFragment";
 
     // Intent variable
-    private static String EXTRA_POSITION = "dk.itu.mmad.bikeshare.EXTRA_POSITION";
+    private static String EXTRA_RIDE_DETAIL = "dk.itu.mmad.bikeshare.EXTRA_RIDE_DETAIL";
 
     // GUI variables
     private Button mAddRide;
@@ -34,7 +38,7 @@ public class BikeShareFragment extends Fragment {
     private TextView mBuildVersion;
 
     // Singleton, adaptor and list view variables
-    private static RidesDB sRidesDB;
+    private RideViewModel mRideViewModel;
     private RideAdaptor mAdaptor;
     private View mDivider;
     private RecyclerView mRecyclerView;
@@ -48,11 +52,17 @@ public class BikeShareFragment extends Fragment {
         mListRides = (Button) v.findViewById(R.id.list_rides_button);
 
         // Singleton to share an object between the app activities
-        sRidesDB = RidesDB.get(getContext());
-        final List<Ride> rides = sRidesDB.getRidesDB();
+        mRideViewModel = ViewModelProviders.of(this).get(RideViewModel.class);
+
+        mRideViewModel.getAllRides().observe(this, new Observer<List<Ride>>() {
+            @Override
+            public void onChanged(@Nullable List<Ride> rides) {
+                mAdaptor.setRides(rides);
+            }
+        });
 
         // Create the adaptor
-        mAdaptor = new RideAdaptor(rides);
+        mAdaptor = new RideAdaptor(getContext());
 
         // Click events
         mAddRide.setOnClickListener(new View.OnClickListener() {
@@ -90,13 +100,37 @@ public class BikeShareFragment extends Fragment {
                     mDivider.setVisibility(LinearLayout.VISIBLE);
                     mRecyclerView.setAdapter(mAdaptor);
 
-//                    mRecyclerView.setOnItemClickListener(new ListView.OnItemClickListener() {
-//                        @Override
-//                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                            Intent intent = RideDetailActivity.newIntent(getContext(), values.get(i), i);
-//                            startActivity(intent);
-//                        }
-//                    });
+                    mRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
+                        // Adapted from https://stackoverflow.com/a/26196831
+
+                        GestureDetector mGestureDetector = new GestureDetector(getContext(),
+                                new GestureDetector.SimpleOnGestureListener() {
+                            @Override
+                            public boolean onSingleTapUp(MotionEvent e) {
+                                return true;
+                            }
+                        });
+
+                        @Override
+                        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                            View childView = rv.findChildViewUnder(e.getX(), e.getY());
+                            if (childView != null && mGestureDetector.onTouchEvent(e)) {
+                                int position = rv.getChildAdapterPosition(childView);
+                                Intent intent = RideDetailActivity.newIntent(getContext(),
+                                        mRideViewModel.getAllRides().getValue().get(position));
+                                startActivity(intent);
+                                return true;
+                            }
+                            return false;
+                        }
+
+                        @Override
+                        public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
+
+                        @Override
+                        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
+                    });
+
                 } else {
                     mDivider.setVisibility(LinearLayout.GONE);
                     mRecyclerView.setAdapter(null);
@@ -107,22 +141,10 @@ public class BikeShareFragment extends Fragment {
         Intent intent = getActivity().getIntent();
 
         if (intent != null) {
-            int position = intent.getIntExtra(EXTRA_POSITION, -1);
-            if (position != -1) {
-
-                // Get deleted ride for toast and delete ride
-                Ride mDeletedRide = rides.get(position);
-                sRidesDB.deleteRide(position);
-
+            String rideDetail = intent.getStringExtra(EXTRA_RIDE_DETAIL);
+            if (rideDetail != null) {
                 // Set toast message
-                String toastMessage = "The " + mDeletedRide.getBikeName() +
-                        " ride that started from " + mDeletedRide.getStartRide();
-
-                if (mDeletedRide.getEndRide().equals("")) {
-                    toastMessage +=  " has been deleted";
-                } else {
-                    toastMessage += " to " + mDeletedRide.getEndRide() + " has been deleted";
-                }
+                String toastMessage = rideDetail + " has been deleted";
 
                 Toast toast = Toast.makeText(getContext(), toastMessage, Toast.LENGTH_LONG);
                 toast.show();

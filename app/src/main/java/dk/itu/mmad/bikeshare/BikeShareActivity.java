@@ -13,11 +13,11 @@ public class BikeShareActivity extends AppCompatActivity {
     private static final String TAG = "BikeShareActivity";
 
     // Intent variable
-    private static String EXTRA_POSITION = "dk.itu.mmad.bikeshare.EXTRA_POSITION";
+    private static String EXTRA_RIDE_DETAIL = "dk.itu.mmad.bikeshare.EXTRA_RIDE_DETAIL";
 
-    public static Intent newIntent(Context packageContext, int position) {
+    public static Intent newIntent(Context packageContext, String rideDetail) {
         Intent intent = new Intent(packageContext, BikeShareActivity.class);
-        intent.putExtra(EXTRA_POSITION, position);
+        intent.putExtra(EXTRA_RIDE_DETAIL, rideDetail);
         return intent;
     }
 
