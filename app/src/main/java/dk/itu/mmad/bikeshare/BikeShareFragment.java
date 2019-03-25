@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -99,44 +100,59 @@ public class BikeShareFragment extends Fragment {
                 if (mRecyclerView.getAdapter() == null) {
                     mDivider.setVisibility(LinearLayout.VISIBLE);
                     mRecyclerView.setAdapter(mAdaptor);
-
-                    mRecyclerView.addOnItemTouchListener(new RecyclerView.OnItemTouchListener() {
-                        // Adapted from https://stackoverflow.com/a/26196831
-
-                        GestureDetector mGestureDetector = new GestureDetector(getContext(),
-                                new GestureDetector.SimpleOnGestureListener() {
-                            @Override
-                            public boolean onSingleTapUp(MotionEvent e) {
-                                return true;
-                            }
-                        });
-
-                        @Override
-                        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                            View childView = rv.findChildViewUnder(e.getX(), e.getY());
-                            if (childView != null && mGestureDetector.onTouchEvent(e)) {
-                                int position = rv.getChildAdapterPosition(childView);
-                                Intent intent = RideDetailActivity.newIntent(getContext(),
-                                        mRideViewModel.getAllRides().getValue().get(position));
-                                startActivity(intent);
-                                return true;
-                            }
-                            return false;
-                        }
-
-                        @Override
-                        public void onTouchEvent(RecyclerView rv, MotionEvent e) { }
-
-                        @Override
-                        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) { }
-                    });
-
                 } else {
                     mDivider.setVisibility(LinearLayout.GONE);
                     mRecyclerView.setAdapter(null);
                 }
             }
         });
+
+//        mRecyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
+//            // Adapted from https://stackoverflow.com/a/26196831
+//
+//            GestureDetector mGestureDetector = new GestureDetector(getContext(),
+//                    new GestureDetector.SimpleOnGestureListener() {
+//                        @Override
+//                        public boolean onSingleTapUp(MotionEvent e) {
+//                            return true;
+//                        }
+//                    });
+//
+//            @Override
+//            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+//                rv.setOnLongClickListener(new RecyclerView.OnLongClickListener() {
+//
+//                    @Override
+//                    public boolean onLongClick(View view) {
+//                        Log.d(TAG, "Clicked");
+//                        return true;
+//                    }
+//                });
+//                boolean isPressed = false;
+//                long startTime = System.currentTimeMillis();
+//
+//                if (e.getAction() == MotionEvent.ACTION_DOWN) {
+//                    isPressed = true;
+//                    startTime = System.currentTimeMillis();
+//                    Log.d(TAG, "Start Time: " + startTime);
+//                }
+//
+//                if (e.getAction() == MotionEvent.ACTION_UP) {
+//                    isPressed = false;
+//                    long duration = System.currentTimeMillis() - startTime;
+//                    Log.d(TAG, "Duration " + duration);
+//                }
+//                View childView = rv.findChildViewUnder(e.getX(), e.getY());
+//                if (childView != null && mGestureDetector.onTouchEvent(e)) {
+//                    int position = rv.getChildAdapterPosition(childView);
+//                    Intent intent = RideDetailActivity.newIntent(getContext(),
+//                            mRideViewModel.getAllRides().getValue().get(position));
+//                    startActivity(intent);
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
 
         Intent intent = getActivity().getIntent();
 
