@@ -25,6 +25,11 @@ import android.widget.Toast;
 
 import java.util.List;
 
+import io.realm.OrderedCollectionChangeSet;
+import io.realm.OrderedRealmCollectionChangeListener;
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 public class BikeShareFragment extends Fragment {
     // Logging variable
     private static final String TAG = "BikeShareFragment";
@@ -44,6 +49,9 @@ public class BikeShareFragment extends Fragment {
     private View mDivider;
     private RecyclerView mRecyclerView;
 
+    // Realm database
+    private Realm mRealm;
+
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedBundleState) {
         View v = inflater.inflate(R.layout.fragment_bike_share, container, false);
@@ -55,15 +63,20 @@ public class BikeShareFragment extends Fragment {
         // Singleton to share an object between the app activities
         mRideViewModel = ViewModelProviders.of(this).get(RideViewModel.class);
 
-        mRideViewModel.getAllRides().observe(this, new Observer<List<Ride>>() {
-            @Override
-            public void onChanged(@Nullable List<Ride> rides) {
-                mAdaptor.setRides(rides);
-            }
-        });
+        // Get Realm database
+        mRealm = Realm.getDefaultInstance();
 
         // Create the adaptor
-        mAdaptor = new RideAdaptor(getContext());
+        mAdaptor = new RideAdaptor(mRealm.where(Ride.class).findAll());
+
+        mRideViewModel.getAllRides()
+                .addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Ride>>() {
+                   @Override
+                   public void onChange(RealmResults<Ride> rides, OrderedCollectionChangeSet changeSet) {
+                       changeSet.getInsertions();
+                   }
+               }
+        );
 
         // Click events
         mAddRide.setOnClickListener(new View.OnClickListener() {
@@ -107,53 +120,6 @@ public class BikeShareFragment extends Fragment {
             }
         });
 
-//        mRecyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
-//            // Adapted from https://stackoverflow.com/a/26196831
-//
-//            GestureDetector mGestureDetector = new GestureDetector(getContext(),
-//                    new GestureDetector.SimpleOnGestureListener() {
-//                        @Override
-//                        public boolean onSingleTapUp(MotionEvent e) {
-//                            return true;
-//                        }
-//                    });
-//
-//            @Override
-//            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-//                rv.setOnLongClickListener(new RecyclerView.OnLongClickListener() {
-//
-//                    @Override
-//                    public boolean onLongClick(View view) {
-//                        Log.d(TAG, "Clicked");
-//                        return true;
-//                    }
-//                });
-//                boolean isPressed = false;
-//                long startTime = System.currentTimeMillis();
-//
-//                if (e.getAction() == MotionEvent.ACTION_DOWN) {
-//                    isPressed = true;
-//                    startTime = System.currentTimeMillis();
-//                    Log.d(TAG, "Start Time: " + startTime);
-//                }
-//
-//                if (e.getAction() == MotionEvent.ACTION_UP) {
-//                    isPressed = false;
-//                    long duration = System.currentTimeMillis() - startTime;
-//                    Log.d(TAG, "Duration " + duration);
-//                }
-//                View childView = rv.findChildViewUnder(e.getX(), e.getY());
-//                if (childView != null && mGestureDetector.onTouchEvent(e)) {
-//                    int position = rv.getChildAdapterPosition(childView);
-//                    Intent intent = RideDetailActivity.newIntent(getContext(),
-//                            mRideViewModel.getAllRides().getValue().get(position));
-//                    startActivity(intent);
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
-
         Intent intent = getActivity().getIntent();
 
         if (intent != null) {
@@ -175,6 +141,14 @@ public class BikeShareFragment extends Fragment {
         super.onResume();
         if (mAdaptor != null) {
             mAdaptor.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mRealm != null) {
+            mRealm.close();
         }
     }
 

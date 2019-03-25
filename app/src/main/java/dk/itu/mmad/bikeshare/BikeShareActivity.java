@@ -8,6 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import io.realm.ObjectServerError;
+import io.realm.Realm;
+import io.realm.SyncConfiguration;
+import io.realm.SyncCredentials;
+import io.realm.SyncUser;
+
 public class BikeShareActivity extends AppCompatActivity {
     // Logging variable
     private static final String TAG = "BikeShareActivity";
@@ -24,6 +30,37 @@ public class BikeShareActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        if (SyncUser.current() != null) {
+//            setUpRealmAndContinueToApp();
+//        }
+//
+//        attemptLogin();
+//    }
+//
+//    private void attemptLogin() {
+//        SyncCredentials credentials = SyncCredentials.nickname(Constants.USERNAME, true);
+//        SyncUser.logInAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback<SyncUser>() {
+//            @Override
+//            public void onSuccess(SyncUser user) {
+//                setUpRealmAndContinueToApp();
+//            }
+//
+//            @Override
+//            public void onError(ObjectServerError error) {
+//                Log.e("Login error", "Uh oh something went wrong! (check your logcat please)");
+//            }
+//        });
+//    }
+//
+//    private void setUpRealmAndContinueToApp() {
+//        SyncConfiguration configuration = SyncUser.current().getDefaultConfiguration();
+//        Realm.setDefaultConfiguration(configuration);
+
+        // Initialise Realm
+        Realm.init(this);
+
+        // Continue to app
         setContentView(R.layout.activity_bike_share);
 
         FragmentManager fm = getSupportFragmentManager();

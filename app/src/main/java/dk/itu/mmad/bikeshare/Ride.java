@@ -9,30 +9,22 @@ import android.support.annotation.NonNull;
 
 import java.util.Date;
 
-@Entity(tableName = "ride")
-public class Ride {
+import io.realm.RealmObject;
+import io.realm.annotations.Required;
 
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
+public class Ride extends RealmObject {
+
+    @PrimaryKey
     private int id;
-
-    @NonNull
-    @ColumnInfo(name = "bike_name")
     private String mBikeName;
-
-    @ColumnInfo(name = "start_ride")
     private String mStartRide;
-
-    @ColumnInfo(name = "start_date")
-    @TypeConverters({Converters.class})
     private Date mStartDate;
-
-    @ColumnInfo(name = "end_ride")
     private String mEndRide;
-
-    @ColumnInfo(name = "end_date")
-    @TypeConverters({Converters.class})
     private Date mEndDate;
+
+    public Ride() {
+
+    }
 
     public Ride(String bikeName, String startRide, Date startDate, String endRide, Date endDate) {
         mBikeName = bikeName;
@@ -93,35 +85,35 @@ public class Ride {
     public String toString() {
         String rideStr = mBikeName;
 
-        if (!mStartRide.equals("")) {
+        if (!mStartRide.isEmpty()) {
             rideStr += " started here: " + mStartRide + " at " + mStartDate.toString();
         }
 
-        if (!mStartRide.equals("") && !mEndRide.equals("")) {
+        if (!mStartRide.isEmpty() && !mEndRide.isEmpty()) {
             rideStr += " and";
         }
 
-        if (!mEndRide.equals("") && mEndDate != null) {
+        if (!mEndRide.isEmpty() && mEndDate != null) {
             rideStr += " ended here: " + mEndRide + " at " + mEndDate.toString();
         }
 
         return rideStr;
     }
 
-    public static class Converters {
-        @TypeConverter
-        public Date fromTimestamp(Long value) {
-            return value == null ? null : new Date(value);
-        }
-
-        @TypeConverter
-        public Long dateToTimestamp(Date date) {
-            if (date == null) {
-                return null;
-            } else {
-                return date.getTime();
-            }
-        }
-    }
+//    public static class Converters {
+//        @TypeConverter
+//        public Date fromTimestamp(Long value) {
+//            return value == null ? null : new Date(value);
+//        }
+//
+//        @TypeConverter
+//        public Long dateToTimestamp(Date date) {
+//            if (date == null) {
+//                return null;
+//            } else {
+//                return date.getTime();
+//            }
+//        }
+//    }
 
 }

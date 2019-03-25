@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import io.realm.Realm;
+
 public class EndRideActivity extends AppCompatActivity {
 
     // GUI variables
@@ -58,10 +60,8 @@ public class EndRideActivity extends AppCompatActivity {
 
                     Ride ride = mRideViewModel.getLatestRide(bikeName);
 
-                    if (ride != null && ride.getEndRide() == null) {
-                        ride.setEndRide(endRide);
-                        ride.setEndDate(endDate);
-                        mRideViewModel.update(ride);
+                    if (ride != null && ride.getEndRide().isEmpty()) {
+                        mRideViewModel.update(ride.getId(), endRide, endDate);
                     } else {
                         mLastEnded.setText("Ride has not started");
                     }

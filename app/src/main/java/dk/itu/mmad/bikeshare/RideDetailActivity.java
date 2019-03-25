@@ -58,8 +58,8 @@ public class RideDetailActivity extends AppCompatActivity {
             mDeleteRide.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mRideViewModel.delete(ride);
                     Intent intent = BikeShareActivity.newIntent(RideDetailActivity.this, ride.toString());
+                    mRideViewModel.delete(ride);
                     startActivity(intent);
                 }
             });
