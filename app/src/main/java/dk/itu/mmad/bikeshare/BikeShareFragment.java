@@ -41,7 +41,7 @@ public class BikeShareFragment extends Fragment {
     private TextView mBuildVersion;
 
     // Database, adaptor and list view variables
-    private RideDB mRideDB;
+    private Realm mRealm;
     private RideAdaptor mAdaptor;
     private View mDivider;
     private RecyclerView mRecyclerView;
@@ -53,21 +53,6 @@ public class BikeShareFragment extends Fragment {
         mAddRide = (Button) v.findViewById(R.id.add_button);
         mEndRide = (Button) v.findViewById(R.id.end_button);
         mListRides = (Button) v.findViewById(R.id.list_rides_button);
-
-        // Singleton to share an object between the app activities
-        mRideDB = new RideDB();
-
-        // Create the adaptor
-        mAdaptor = new RideAdaptor(mRideDB.getAllRides());
-
-        mRideDB.getAllRides()
-                .addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Ride>>() {
-                   @Override
-                   public void onChange(RealmResults<Ride> rides, OrderedCollectionChangeSet changeSet) {
-                       changeSet.getInsertions();
-                   }
-               }
-        );
 
         // Click events
         mAddRide.setOnClickListener(new View.OnClickListener() {
@@ -90,23 +75,32 @@ public class BikeShareFragment extends Fragment {
         mBuildVersion = (TextView) v.findViewById(R.id.build_version);
         mBuildVersion.setText("API level " + Build.VERSION.SDK_INT);
 
+        // Database
+        mRealm = Realm.getDefaultInstance();
+
         // Create list view with divider
         mDivider = (View) v.findViewById(R.id.divider);
         mDivider.setVisibility(LinearLayout.GONE);
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.main_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setVisibility(RecyclerView.GONE);
+
+        mRealm.beginTransaction();
+        mAdaptor = new RideAdaptor(mRealm.where(Ride.class).findAllAsync());
+        mRealm.commitTransaction();
+
+        mRecyclerView.setAdapter(mAdaptor);
 
         mListRides.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                if (mRecyclerView.getAdapter() == null) {
+                if (mRecyclerView.getVisibility() == RecyclerView.GONE) {
                     mDivider.setVisibility(LinearLayout.VISIBLE);
-                    mRecyclerView.setAdapter(mAdaptor);
+                    mRecyclerView.setVisibility(RecyclerView.VISIBLE);
                 } else {
                     mDivider.setVisibility(LinearLayout.GONE);
-                    mRecyclerView.setAdapter(null);
+                    mRecyclerView.setVisibility(RecyclerView.GONE);
                 }
             }
         });
@@ -138,8 +132,8 @@ public class BikeShareFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mRideDB != null) {
-            mRideDB.close();
+        if (mRealm != null) {
+            mRealm.close();
         }
     }
 

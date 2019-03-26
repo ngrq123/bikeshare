@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import io.realm.Realm;
+import io.realm.Sort;
+
 public class RideDetailActivity extends AppCompatActivity {
 
     private static final String EXTRA_ID = "dk.itu.mmad.bikeshare.id";
@@ -19,7 +22,7 @@ public class RideDetailActivity extends AppCompatActivity {
     private Button mDeleteRide;
 
     // Database
-    private RideDB mRideDB;
+    private Realm mRealm;
 
     public static Intent newIntent(Context packageContext, Ride ride) {
         Intent intent = new Intent(packageContext, RideDetailActivity.class);
@@ -40,13 +43,17 @@ public class RideDetailActivity extends AppCompatActivity {
         // Button
         mDeleteRide = (Button) findViewById(R.id.delete_button);
 
-        // Singleton to share an object between the app activities
-        mRideDB = new RideDB();
+        // Database
+        mRealm = Realm.getDefaultInstance();
 
         int rideId = getIntent().getIntExtra(EXTRA_ID, -1);
 
         if (rideId != -1) {
-            final Ride ride = mRideDB.getRide(rideId);
+            mRealm.beginTransaction();
+            final Ride ride = mRealm.where(Ride.class)
+                    .equalTo("id", rideId)
+                    .findFirst();
+            mRealm.commitTransaction();
 
             // Set texts
             mBikeName.setText(ride.getBikeName());
@@ -58,19 +65,22 @@ public class RideDetailActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Intent intent = BikeShareActivity.newIntent(RideDetailActivity.this, ride.toString());
-                    mRideDB.delete(ride);
+
+                    mRealm.beginTransaction();
+                    ride.deleteFromRealm();
+                    mRealm.commitTransaction();
+
                     startActivity(intent);
                 }
             });
         }
-
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mRideDB != null) {
-            mRideDB.close();
+        if (mRealm != null) {
+            mRealm.close();
         }
     }
 }

@@ -72,8 +72,6 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
             }
         }
 
-
-
         return true;
     }
 }

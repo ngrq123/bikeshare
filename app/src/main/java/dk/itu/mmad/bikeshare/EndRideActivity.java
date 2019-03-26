@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.Sort;
 
 public class EndRideActivity extends AppCompatActivity {
 
@@ -21,7 +22,7 @@ public class EndRideActivity extends AppCompatActivity {
     private TextView mNewWhere;
 
     // Database
-    private RideDB mRideDB;
+    private Realm mRealm;
 
     // Last ride information
     private Ride mLast = new Ride("", "", null, "", null);
@@ -41,29 +42,39 @@ public class EndRideActivity extends AppCompatActivity {
         mNewWhat = (TextView) findViewById(R.id.what_text);
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
-        // Singleton to share an object between the app activities
-        mRideDB = new RideDB();
+        // Database
+        mRealm = Realm.getDefaultInstance();
 
         // End ride click event
         mEndRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mNewWhat.getText().length() > 0 && mNewWhere.getText().length() > 0) {
-                    String bikeName = mNewWhat.getText().toString().trim();
-                    String endRide = mNewWhere.getText().toString().trim();
-                    Date endDate = Calendar.getInstance().getTime();
+                    final String bikeName = mNewWhat.getText().toString().trim();
+                    final String endRide = mNewWhere.getText().toString().trim();
+                    final Date endDate = Calendar.getInstance().getTime();
 
                     mLast.setBikeName(bikeName);
                     mLast.setEndRide(endRide);
                     mLast.setEndDate(endDate);
 
-                    Ride ride = mRideDB.getLatestRide(bikeName);
+                    mRealm.executeTransactionAsync(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm bgRealm) {
+                            Ride ride = bgRealm.where(Ride.class)
+                                    .equalTo("mBikeName", bikeName)
+                                    .sort("id", Sort.DESCENDING)
+                                    .findFirst();
+                            if (ride != null && ride.getEndRide().isEmpty()) {
+                                ride.setEndRide(endRide);
+                                ride.setEndDate(endDate);
+                                bgRealm.insertOrUpdate(ride);
+                            } else {
+                                mLastEnded.setText("Ride has not started");
+                            }
 
-                    if (ride != null && ride.getEndRide().isEmpty()) {
-                        mRideDB.update(ride, endRide, endDate);
-                    } else {
-                        mLastEnded.setText("Ride has not started");
-                    }
+                        }
+                    });
 
                     // Reset text fields
                     mNewWhat.setText("");
@@ -77,8 +88,8 @@ public class EndRideActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mRideDB != null) {
-            mRideDB.close();
+        if (mRealm != null) {
+            mRealm.close();
         }
     }
 

@@ -33,33 +33,40 @@ public class BikeShareActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bike_share);
 
         // Initialise Realm
+        Log.d(TAG, "Initialising Realm");
         Realm.init(this);
 
-//        if (SyncUser.current() != null) {
-//            setUpRealmAndContinueToApp();
-//        }
-//
-//        attemptLogin();
-//    }
-//
-//    private void attemptLogin() {
-//        SyncCredentials credentials = SyncCredentials.nickname(Constants.USERNAME, true);
-//        SyncUser.logInAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback<SyncUser>() {
-//            @Override
-//            public void onSuccess(SyncUser user) {
-//                setUpRealmAndContinueToApp();
-//            }
-//
-//            @Override
-//            public void onError(ObjectServerError error) {
-//                Log.e("Login error", "Uh oh something went wrong! (check your logcat please)");
-//            }
-//        });
-//    }
-//
-//    private void setUpRealmAndContinueToApp() {
-//        SyncConfiguration configuration = SyncUser.current().getDefaultConfiguration();
-//        Realm.setDefaultConfiguration(configuration);
+        if (SyncUser.current() != null) {
+            setUpRealmAndContinueToApp();
+        } else {
+            attemptLogin();
+        }
+    }
+
+    private void attemptLogin() {
+        Log.d(TAG, "Logging in");
+        SyncCredentials credentials = SyncCredentials.nickname(Constants.USERNAME, false);
+        SyncUser.logInAsync(credentials, Constants.AUTH_URL, new SyncUser.Callback<SyncUser>() {
+            @Override
+            public void onSuccess(SyncUser user) {
+                Log.i(TAG, "Login successful");
+                setUpRealmAndContinueToApp();
+            }
+
+            @Override
+            public void onError(ObjectServerError error) {
+                Log.e(TAG, "Uh oh something went wrong! (check your logcat please)");
+                Log.e("Login error", error.toString());
+            }
+        });
+    }
+
+    private void setUpRealmAndContinueToApp() {
+        SyncConfiguration configuration = SyncUser.current()
+                .createConfiguration(Constants.REALM_BASE_URL + "/~/" + Constants.USERNAME)
+                .fullSynchronization()
+                .build();
+        Realm.setDefaultConfiguration(configuration);
 
         // Continue to app
         FragmentManager fm = getSupportFragmentManager();

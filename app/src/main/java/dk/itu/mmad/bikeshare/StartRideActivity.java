@@ -11,6 +11,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.Sort;
+
 public class StartRideActivity extends AppCompatActivity {
 
     // GUI variables
@@ -20,7 +23,7 @@ public class StartRideActivity extends AppCompatActivity {
     private TextView mNewWhere;
 
     // Database
-    private RideDB mRideDB;
+    private Realm mRealm;
 
     // Last ride information
     private Ride mLast = new Ride("", "", null, "", null);
@@ -41,7 +44,7 @@ public class StartRideActivity extends AppCompatActivity {
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
         // Database
-        mRideDB = new RideDB();
+        mRealm = Realm.getDefaultInstance();
 
         // Add ride click event
         mAddRide.setOnClickListener(new View.OnClickListener() {
@@ -56,7 +59,18 @@ public class StartRideActivity extends AppCompatActivity {
                     mLast.setStartRide(startRide);
                     mLast.setStartDate(startDate);
 
-                    mRideDB.insert(mLast);
+                    mRealm.executeTransactionAsync(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm bgRealm) {
+                            Ride maxIdRide = bgRealm.where(Ride.class)
+                                    .sort("id", Sort.DESCENDING)
+                                    .findFirst();
+                            int rideId = (maxIdRide == null) ? 1 : (maxIdRide.getId() + 1);
+
+                            mLast.setId(rideId);
+                            bgRealm.insert(mLast);
+                        }
+                    });
 
                     // Reset text fields
                     mNewWhat.setText("");
@@ -70,8 +84,8 @@ public class StartRideActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mRideDB != null) {
-            mRideDB.close();
+        if (mRealm != null) {
+            mRealm.close();
         }
     }
 
