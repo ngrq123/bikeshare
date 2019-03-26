@@ -10,14 +10,14 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-public class RideViewModel {
+public class RideDB {
 
     private Realm mRealm;
 
     // Logging variable
     private static final String TAG = "RideViewModel";
 
-    public RideViewModel() {
+    public RideDB() {
         mRealm = Realm.getDefaultInstance();
     }
 

@@ -20,7 +20,7 @@ public class StartRideActivity extends AppCompatActivity {
     private TextView mNewWhere;
 
     // Singleton
-    private RideViewModel mRideViewModel;
+    private RideDB mRideDB;
 
     // Last ride information
     private Ride mLast = new Ride("", "", null, "", null);
@@ -41,7 +41,7 @@ public class StartRideActivity extends AppCompatActivity {
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
         // Singleton to share an object between the app activities
-        mRideViewModel = new RideViewModel();
+        mRideDB = new RideDB();
 
         // Add ride click event
         mAddRide.setOnClickListener(new View.OnClickListener() {
@@ -56,7 +56,7 @@ public class StartRideActivity extends AppCompatActivity {
                     mLast.setStartRide(startRide);
                     mLast.setStartDate(startDate);
 
-                    mRideViewModel.insert(mLast);
+                    mRideDB.insert(mLast);
 
                     // Reset text fields
                     mNewWhat.setText("");

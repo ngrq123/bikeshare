@@ -41,7 +41,7 @@ public class BikeShareFragment extends Fragment {
     private TextView mBuildVersion;
 
     // Singleton, adaptor and list view variables
-    private RideViewModel mRideViewModel;
+    private RideDB mRideDB;
     private RideAdaptor mAdaptor;
     private View mDivider;
     private RecyclerView mRecyclerView;
@@ -58,7 +58,7 @@ public class BikeShareFragment extends Fragment {
         mListRides = (Button) v.findViewById(R.id.list_rides_button);
 
         // Singleton to share an object between the app activities
-        mRideViewModel = new RideViewModel();
+        mRideDB = new RideDB();
 
         // Get Realm database
         mRealm = Realm.getDefaultInstance();
@@ -66,7 +66,7 @@ public class BikeShareFragment extends Fragment {
         // Create the adaptor
         mAdaptor = new RideAdaptor(mRealm.where(Ride.class).findAll());
 
-        mRideViewModel.getAllRides()
+        mRideDB.getAllRides()
                 .addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Ride>>() {
                    @Override
                    public void onChange(RealmResults<Ride> rides, OrderedCollectionChangeSet changeSet) {

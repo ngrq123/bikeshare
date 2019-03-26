@@ -19,7 +19,7 @@ public class RideDetailActivity extends AppCompatActivity {
     private Button mDeleteRide;
 
     // Singleton
-    private RideViewModel mRideViewModel;
+    private RideDB mRideDB;
 
     public static Intent newIntent(Context packageContext, Ride ride) {
         Intent intent = new Intent(packageContext, RideDetailActivity.class);
@@ -41,12 +41,12 @@ public class RideDetailActivity extends AppCompatActivity {
         mDeleteRide = (Button) findViewById(R.id.delete_button);
 
         // Singleton to share an object between the app activities
-        mRideViewModel = new RideViewModel();
+        mRideDB = new RideDB();
 
         int rideId = getIntent().getIntExtra(EXTRA_ID, -1);
 
         if (rideId != -1) {
-            final Ride ride = mRideViewModel.getRide(rideId);
+            final Ride ride = mRideDB.getRide(rideId);
 
             // Set texts
             mBikeName.setText(ride.getBikeName());
@@ -58,7 +58,7 @@ public class RideDetailActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     Intent intent = BikeShareActivity.newIntent(RideDetailActivity.this, ride.toString());
-                    mRideViewModel.delete(ride);
+                    mRideDB.delete(ride);
                     startActivity(intent);
                 }
             });

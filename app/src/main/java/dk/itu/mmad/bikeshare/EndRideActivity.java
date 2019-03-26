@@ -21,7 +21,7 @@ public class EndRideActivity extends AppCompatActivity {
     private TextView mNewWhere;
 
     // Singleton
-    private RideViewModel mRideViewModel;
+    private RideDB mRideDB;
 
     // Last ride information
     private Ride mLast = new Ride("", "", null, "", null);
@@ -42,7 +42,7 @@ public class EndRideActivity extends AppCompatActivity {
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
         // Singleton to share an object between the app activities
-        mRideViewModel = new RideViewModel();
+        mRideDB = new RideDB();
 
         // End ride click event
         mEndRide.setOnClickListener(new View.OnClickListener() {
@@ -57,10 +57,10 @@ public class EndRideActivity extends AppCompatActivity {
                     mLast.setEndRide(endRide);
                     mLast.setEndDate(endDate);
 
-                    Ride ride = mRideViewModel.getLatestRide(bikeName);
+                    Ride ride = mRideDB.getLatestRide(bikeName);
 
                     if (ride != null && ride.getEndRide().isEmpty()) {
-                        mRideViewModel.update(ride, endRide, endDate);
+                        mRideDB.update(ride, endRide, endDate);
                     } else {
                         mLastEnded.setText("Ride has not started");
                     }
