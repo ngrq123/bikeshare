@@ -19,7 +19,7 @@ public class StartRideActivity extends AppCompatActivity {
     private TextView mNewWhat;
     private TextView mNewWhere;
 
-    // Singleton
+    // Database
     private RideDB mRideDB;
 
     // Last ride information
@@ -40,7 +40,7 @@ public class StartRideActivity extends AppCompatActivity {
         mNewWhat = (TextView) findViewById(R.id.what_text);
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
-        // Singleton to share an object between the app activities
+        // Database
         mRideDB = new RideDB();
 
         // Add ride click event
@@ -65,8 +65,14 @@ public class StartRideActivity extends AppCompatActivity {
                 }
             }
         });
+    }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mRideDB != null) {
+            mRideDB.close();
+        }
     }
 
     private void updateUI() {

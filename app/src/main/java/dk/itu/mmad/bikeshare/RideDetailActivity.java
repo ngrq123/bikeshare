@@ -18,7 +18,7 @@ public class RideDetailActivity extends AppCompatActivity {
 
     private Button mDeleteRide;
 
-    // Singleton
+    // Database
     private RideDB mRideDB;
 
     public static Intent newIntent(Context packageContext, Ride ride) {
@@ -64,5 +64,13 @@ public class RideDetailActivity extends AppCompatActivity {
             });
         }
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mRideDB != null) {
+            mRideDB.close();
+        }
     }
 }

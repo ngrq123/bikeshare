@@ -9,6 +9,7 @@ import java.util.List;
 import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
+import io.realm.SyncUser;
 
 public class RideDB {
 
@@ -22,6 +23,9 @@ public class RideDB {
     }
 
     public void insert(final Ride ride) {
+        // Increment id
+        ride.setId(getMaxId() + 1);
+
         mRealm.executeTransactionAsync(new Realm.Transaction() {
             @Override
             public void execute(Realm bgRealm) {
@@ -48,13 +52,17 @@ public class RideDB {
             ride.setEndRide(endRide);
             ride.setEndDate(endDate);
             mRealm.commitTransaction();
+            Log.d(TAG, "Updating of ride successful");
+        } else {
+            Log.d(TAG, "Updating of ride failed");
         }
     }
 
-    public void delete(final Ride ride) {
+    public void delete(Ride ride) {
         mRealm.beginTransaction();
         ride.deleteFromRealm();
         mRealm.commitTransaction();
+        Log.d(TAG, "Deletion of ride successful");
     }
 
     public void deleteAll() {
@@ -91,5 +99,19 @@ public class RideDB {
                 .findFirst();
         mRealm.commitTransaction();
         return ride;
+    }
+
+    public int getMaxId() {
+        mRealm.beginTransaction();
+        Ride ride = mRealm.where(Ride.class)
+                .sort("id", Sort.DESCENDING)
+                .findFirst();
+        mRealm.commitTransaction();
+
+        return (ride == null) ? 0 : ride.getId();
+    }
+
+    public void close() {
+        mRealm.close();
     }
 }

@@ -20,7 +20,7 @@ public class EndRideActivity extends AppCompatActivity {
     private TextView mNewWhat;
     private TextView mNewWhere;
 
-    // Singleton
+    // Database
     private RideDB mRideDB;
 
     // Last ride information
@@ -72,6 +72,14 @@ public class EndRideActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mRideDB != null) {
+            mRideDB.close();
+        }
     }
 
     private void updateUI() {

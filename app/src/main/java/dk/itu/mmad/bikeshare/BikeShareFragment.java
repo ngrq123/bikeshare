@@ -40,14 +40,11 @@ public class BikeShareFragment extends Fragment {
     private Button mListRides;
     private TextView mBuildVersion;
 
-    // Singleton, adaptor and list view variables
+    // Database, adaptor and list view variables
     private RideDB mRideDB;
     private RideAdaptor mAdaptor;
     private View mDivider;
     private RecyclerView mRecyclerView;
-
-    // Realm database
-    private Realm mRealm;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedBundleState) {
@@ -60,11 +57,8 @@ public class BikeShareFragment extends Fragment {
         // Singleton to share an object between the app activities
         mRideDB = new RideDB();
 
-        // Get Realm database
-        mRealm = Realm.getDefaultInstance();
-
         // Create the adaptor
-        mAdaptor = new RideAdaptor(mRealm.where(Ride.class).findAll());
+        mAdaptor = new RideAdaptor(mRideDB.getAllRides());
 
         mRideDB.getAllRides()
                 .addChangeListener(new OrderedRealmCollectionChangeListener<RealmResults<Ride>>() {
@@ -144,8 +138,8 @@ public class BikeShareFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mRealm != null) {
-            mRealm.close();
+        if (mRideDB != null) {
+            mRideDB.close();
         }
     }
 
