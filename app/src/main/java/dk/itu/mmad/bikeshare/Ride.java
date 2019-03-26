@@ -1,16 +1,9 @@
 package dk.itu.mmad.bikeshare;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverter;
-import android.arch.persistence.room.TypeConverters;
-import android.support.annotation.NonNull;
-
 import java.util.Date;
 
 import io.realm.RealmObject;
-import io.realm.annotations.Required;
+import io.realm.annotations.PrimaryKey;
 
 public class Ride extends RealmObject {
 

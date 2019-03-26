@@ -1,7 +1,5 @@
 package dk.itu.mmad.bikeshare;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,7 +41,7 @@ public class StartRideActivity extends AppCompatActivity {
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
         // Singleton to share an object between the app activities
-        mRideViewModel = ViewModelProviders.of(this).get(RideViewModel.class);
+        mRideViewModel = new RideViewModel();
 
         // Add ride click event
         mAddRide.setOnClickListener(new View.OnClickListener() {

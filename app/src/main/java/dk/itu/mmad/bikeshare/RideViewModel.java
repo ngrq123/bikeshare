@@ -1,8 +1,6 @@
 package dk.itu.mmad.bikeshare;
 
 import android.app.Application;
-import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
 import android.util.Log;
 
 import java.util.Date;
@@ -12,15 +10,14 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-public class RideViewModel extends AndroidViewModel {
+public class RideViewModel {
 
     private Realm mRealm;
 
     // Logging variable
     private static final String TAG = "RideViewModel";
 
-    public RideViewModel(Application application) {
-        super(application);
+    public RideViewModel() {
         mRealm = Realm.getDefaultInstance();
     }
 
@@ -43,15 +40,15 @@ public class RideViewModel extends AndroidViewModel {
         });
     }
 
-    public void update(int id, String endRide, Date endDate) {
-        Ride ride = getRide(id);
+    public void update(Ride rideToUpdate, String endRide, Date endDate) {
+        Ride ride = getRide(rideToUpdate.getId());
 
-        mRealm.beginTransaction();
         if (ride != null) {
+            mRealm.beginTransaction();
             ride.setEndRide(endRide);
             ride.setEndDate(endDate);
+            mRealm.commitTransaction();
         }
-        mRealm.commitTransaction();
     }
 
     public void delete(final Ride ride) {

@@ -1,8 +1,5 @@
 package dk.itu.mmad.bikeshare;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -61,7 +58,7 @@ public class BikeShareFragment extends Fragment {
         mListRides = (Button) v.findViewById(R.id.list_rides_button);
 
         // Singleton to share an object between the app activities
-        mRideViewModel = ViewModelProviders.of(this).get(RideViewModel.class);
+        mRideViewModel = new RideViewModel();
 
         // Get Realm database
         mRealm = Realm.getDefaultInstance();

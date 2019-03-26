@@ -30,6 +30,10 @@ public class BikeShareActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_bike_share);
+
+        // Initialise Realm
+        Realm.init(this);
 
 //        if (SyncUser.current() != null) {
 //            setUpRealmAndContinueToApp();
@@ -57,12 +61,7 @@ public class BikeShareActivity extends AppCompatActivity {
 //        SyncConfiguration configuration = SyncUser.current().getDefaultConfiguration();
 //        Realm.setDefaultConfiguration(configuration);
 
-        // Initialise Realm
-        Realm.init(this);
-
         // Continue to app
-        setContentView(R.layout.activity_bike_share);
-
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
 

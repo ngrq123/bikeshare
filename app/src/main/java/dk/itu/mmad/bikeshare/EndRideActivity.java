@@ -1,6 +1,5 @@
 package dk.itu.mmad.bikeshare;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -43,7 +42,7 @@ public class EndRideActivity extends AppCompatActivity {
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
         // Singleton to share an object between the app activities
-        mRideViewModel = ViewModelProviders.of(this).get(RideViewModel.class);
+        mRideViewModel = new RideViewModel();
 
         // End ride click event
         mEndRide.setOnClickListener(new View.OnClickListener() {
@@ -61,7 +60,7 @@ public class EndRideActivity extends AppCompatActivity {
                     Ride ride = mRideViewModel.getLatestRide(bikeName);
 
                     if (ride != null && ride.getEndRide().isEmpty()) {
-                        mRideViewModel.update(ride.getId(), endRide, endDate);
+                        mRideViewModel.update(ride, endRide, endDate);
                     } else {
                         mLastEnded.setText("Ride has not started");
                     }

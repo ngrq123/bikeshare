@@ -1,6 +1,5 @@
 package dk.itu.mmad.bikeshare;
 
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
@@ -42,7 +41,7 @@ public class RideDetailActivity extends AppCompatActivity {
         mDeleteRide = (Button) findViewById(R.id.delete_button);
 
         // Singleton to share an object between the app activities
-        mRideViewModel = ViewModelProviders.of(this).get(RideViewModel.class);
+        mRideViewModel = new RideViewModel();
 
         int rideId = getIntent().getIntExtra(EXTRA_ID, -1);
 
