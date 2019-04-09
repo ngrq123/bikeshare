@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.File;
+
 import io.realm.Realm;
 import io.realm.Sort;
 
@@ -60,11 +62,19 @@ public class RideDetailActivity extends AppCompatActivity {
             mStartRide.setText(ride.getStartRide());
             mEndRide.setText(ride.getEndRide());
 
+            final File fileDir = this.getFilesDir();
+
             // Delete ride click event
             mDeleteRide.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = BikeShareActivity.newIntent(RideDetailActivity.this, ride.toString());
+
+                    // Delete photo if file exists
+                    File photoFile = new File(fileDir, "bike_photo_" + ride.getId()  + ".jpg");
+                    if (photoFile.exists()) {
+                        photoFile.delete();
+                    }
 
                     mRealm.beginTransaction();
                     ride.deleteFromRealm();

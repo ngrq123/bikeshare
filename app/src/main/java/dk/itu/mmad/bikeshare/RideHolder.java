@@ -1,18 +1,29 @@
 package dk.itu.mmad.bikeshare;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.File;
 
 public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
 
     private TextView mBikeNameView;
     private TextView mStartRideView;
     private TextView mEndRideView;
+
+    private ImageView mBikePhoto;
+
+    private File mPhotoFile;
+    private File mFileDir;
 
     private Ride mRide;
 
@@ -27,14 +38,26 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
         mBikeNameView = itemView.findViewById(R.id.what_bike_ride);
         mStartRideView = itemView.findViewById(R.id.start_ride);
         mEndRideView = itemView.findViewById(R.id.end_ride);
+        mBikePhoto = itemView.findViewById(R.id.bike_photo);
+
+        mFileDir = itemView.getContext().getFilesDir();
     }
 
     public void bind(Ride ride) {
         mRide = ride;
 
         mBikeNameView.setText(ride.getBikeName());
-        mStartRideView.setText(ride.getStartRide());
-        mEndRideView.setText(ride.getEndRide());
+        mStartRideView.setText("Start: " + ride.getStartRide());
+
+        if (ride.getEndRide() != null && !ride.getEndRide().isEmpty()) {
+            mEndRideView.setText("End: " + ride.getEndRide());
+        }
+
+        // Show photo if file exists
+        mPhotoFile = new File(mFileDir, "bike_photo_" + ride.getId()  + ".jpg");
+        if (mPhotoFile.exists()) {
+            showPhoto();
+        }
     }
 
     @Override
@@ -73,5 +96,16 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
         }
 
         return true;
+    }
+
+    // Adapted from textbook listing 16.11 (page 315)
+    private void showPhoto() {
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            mBikePhoto.setImageDrawable(null);
+        } else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap(
+                    mPhotoFile.getPath(), itemView.getWidth(), itemView.getHeight());
+            mBikePhoto.setImageBitmap(bitmap);
+        }
     }
 }
