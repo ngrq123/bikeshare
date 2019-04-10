@@ -1,4 +1,4 @@
-package dk.itu.mmad.bikeshare;
+package dk.itu.mmad.bikeshare.controller;
 
 final class Constants {
     static final String INSTANCE_ADDRESS = "mmda-bsc-2019.de1a.cloud.realm.io";

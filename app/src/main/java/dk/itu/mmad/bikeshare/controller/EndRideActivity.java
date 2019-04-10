@@ -1,19 +1,23 @@
-package dk.itu.mmad.bikeshare;
+package dk.itu.mmad.bikeshare.controller;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
+import dk.itu.mmad.bikeshare.R;
+import dk.itu.mmad.bikeshare.model.Bike;
+import dk.itu.mmad.bikeshare.model.Ride;
 import io.realm.Realm;
 import io.realm.Sort;
 
 public class EndRideActivity extends AppCompatActivity {
+    private static final String TAG = "EndRideActivity";
 
     // GUI variables
     private Button mEndRide;
@@ -25,7 +29,7 @@ public class EndRideActivity extends AppCompatActivity {
     private Realm mRealm;
 
     // Last ride information
-    private Ride mLast = new Ride("", "", null, "", null);
+    private Ride mLast = new Ride(-1, "", null, null, null);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,32 +58,34 @@ public class EndRideActivity extends AppCompatActivity {
                     final String endRide = mNewWhere.getText().toString().trim();
                     final Date endDate = Calendar.getInstance().getTime();
 
-                    mLast.setBikeName(bikeName);
-                    mLast.setEndRide(endRide);
-                    mLast.setEndDate(endDate);
+                    mRealm.beginTransaction();
+                    Bike bike = mRealm.where(Bike.class)
+                            .equalTo("mName", bikeName)
+                            .findFirst();
 
-                    mRealm.executeTransactionAsync(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm bgRealm) {
-                            Ride ride = bgRealm.where(Ride.class)
-                                    .equalTo("mBikeName", bikeName)
-                                    .sort("id", Sort.DESCENDING)
-                                    .findFirst();
-                            if (ride != null && ride.getEndRide().isEmpty()) {
-                                ride.setEndRide(endRide);
-                                ride.setEndDate(endDate);
-                                bgRealm.insertOrUpdate(ride);
-                            } else {
-                                mLastEnded.setText("Ride has not started");
-                            }
+                    if (bike == null) {
+                        mLastEnded.setText("Bike not found");
+                    } else {
+                        Ride ride = mRealm.where(Ride.class)
+                                .equalTo("mBikeId", bike.getId())
+                                .sort("mId", Sort.DESCENDING)
+                                .findFirst();
 
+                        if (ride != null && ride.getEndLocation() == null) {
+                            mLast = ride;
+                            mLast.setEndLocation(endRide);
+                            mLast.setEndDate(endDate);
+                            mRealm.insertOrUpdate(mLast);
+                            updateUI();
+                        } else {
+                            mLastEnded.setText("Ride has not started");
                         }
-                    });
+                        mRealm.commitTransaction();
 
-                    // Reset text fields
-                    mNewWhat.setText("");
-                    mNewWhere.setText("");
-                    updateUI();
+                        // Reset text fields
+                        mNewWhat.setText("");
+                        mNewWhere.setText("");
+                    }
                 }
             }
         });
@@ -94,10 +100,12 @@ public class EndRideActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        if (mLast.getBikeName().isEmpty() && mLast.getStartRide().isEmpty()) {
+        if (mLast.getId() == -1) {
             mLastEnded.setText("");
         } else {
-            mLastEnded.setText(mLast.toString());
+            String rideStr = mLast.getBike().getName() + " ended at " +
+                    mLast.getEndLocation() + " on " + mLast.getEndDate();
+            mLastEnded.setText(rideStr);
         }
     }
 }

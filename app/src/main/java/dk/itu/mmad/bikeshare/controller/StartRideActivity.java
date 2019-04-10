@@ -1,4 +1,4 @@
-package dk.itu.mmad.bikeshare;
+package dk.itu.mmad.bikeshare.controller;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,14 +7,11 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +20,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import dk.itu.mmad.bikeshare.R;
+import dk.itu.mmad.bikeshare.model.Bike;
+import dk.itu.mmad.bikeshare.model.Ride;
+import dk.itu.mmad.bikeshare.util.PictureUtils;
 import io.realm.Realm;
 import io.realm.Sort;
 
@@ -42,7 +43,7 @@ public class StartRideActivity extends AppCompatActivity {
     private Realm mRealm;
 
     // Last ride information
-    private Ride mLast = new Ride("", "", null, "", null);
+    private Ride mLast = new Ride(-1, "", null, null, null);
 
     // Photo file
     private File mPhotoFile;
@@ -108,30 +109,32 @@ public class StartRideActivity extends AppCompatActivity {
                     String startRide = mNewWhere.getText().toString().trim();
                     Date startDate = Calendar.getInstance().getTime();
 
-                    mLast.setBikeName(bikeName);
-                    mLast.setStartRide(startRide);
-                    mLast.setStartDate(startDate);
+                    mRealm.beginTransaction();
+                    final Bike bike = mRealm.where(Bike.class)
+                            .equalTo("mName", bikeName)
+                            .findFirst();
+                    mRealm.commitTransaction();
 
-                    mRealm.executeTransactionAsync(new Realm.Transaction() {
-                        @Override
-                        public void execute(Realm bgRealm) {
-                            Ride maxIdRide = bgRealm.where(Ride.class)
-                                    .sort("id", Sort.DESCENDING)
-                                    .findFirst();
-                            int rideId = (maxIdRide == null) ? 1 : (maxIdRide.getId() + 1);
+                    if (bike == null) {
+                        mLastAdded.setText("Bike is not found");
+                    } else {
+                        mRealm.beginTransaction();
+                        Ride maxIdRide = mRealm.where(Ride.class)
+                                .sort("mId", Sort.DESCENDING)
+                                .findFirst();
+                        int rideId = (maxIdRide == null) ? 1 : (maxIdRide.getId() + 1);
 
-                            mLast.setId(rideId);
-                            bgRealm.insert(mLast);
+                        mLast = new Ride(rideId, startRide, startDate, null, bike);
+                        mRealm.insert(mLast);
+                        mRealm.commitTransaction();
+                        mPhotoFile.renameTo(new File(fileDir, "bike_photo_" + rideId + ".jpg"));
 
-                            mPhotoFile.renameTo(new File(fileDir, "bike_photo_" + rideId + ".jpg"));
-                        }
-                    });
-
-                    // Reset fields
-                    mNewWhat.setText("");
-                    mNewWhere.setText("");
-                    mPhotoView.setImageDrawable(null);
-                    updateUI();
+                        // Reset fields
+                        mNewWhat.setText("");
+                        mNewWhere.setText("");
+                        mPhotoView.setImageDrawable(null);
+                        updateUI();
+                    }
                 }
             }
         });
@@ -163,7 +166,7 @@ public class StartRideActivity extends AppCompatActivity {
     }
 
     private void updateUI() {
-        if (mLast.getBikeName().isEmpty() && mLast.getStartRide().isEmpty()) {
+        if (mLast.getId() == -1) {
             mLastAdded.setText("");
         } else {
             mLastAdded.setText(mLast.toString());

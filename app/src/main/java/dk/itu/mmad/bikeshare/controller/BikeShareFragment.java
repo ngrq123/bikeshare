@@ -1,18 +1,12 @@
-package dk.itu.mmad.bikeshare;
+package dk.itu.mmad.bikeshare.controller;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.SystemClock;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -20,12 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.List;
-
-import io.realm.OrderedCollectionChangeSet;
-import io.realm.OrderedRealmCollectionChangeListener;
+import dk.itu.mmad.bikeshare.R;
+import dk.itu.mmad.bikeshare.model.Ride;
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class BikeShareFragment extends Fragment {
     // Logging variable

@@ -1,4 +1,4 @@
-package dk.itu.mmad.bikeshare;
+package dk.itu.mmad.bikeshare.controller;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,8 +10,9 @@ import android.widget.TextView;
 
 import java.io.File;
 
+import dk.itu.mmad.bikeshare.R;
+import dk.itu.mmad.bikeshare.model.Ride;
 import io.realm.Realm;
-import io.realm.Sort;
 
 public class RideDetailActivity extends AppCompatActivity {
 
@@ -53,14 +54,14 @@ public class RideDetailActivity extends AppCompatActivity {
         if (rideId != -1) {
             mRealm.beginTransaction();
             final Ride ride = mRealm.where(Ride.class)
-                    .equalTo("id", rideId)
+                    .equalTo("mId", rideId)
                     .findFirst();
             mRealm.commitTransaction();
 
             // Set texts
-            mBikeName.setText(ride.getBikeName());
-            mStartRide.setText(ride.getStartRide());
-            mEndRide.setText(ride.getEndRide());
+            mBikeName.setText(ride.getBike().getName());
+            mStartRide.setText(ride.getStartLocation());
+            mEndRide.setText(ride.getEndLocation());
 
             final File fileDir = this.getFilesDir();
 

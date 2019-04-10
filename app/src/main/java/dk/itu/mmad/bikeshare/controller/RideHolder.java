@@ -1,11 +1,9 @@
-package dk.itu.mmad.bikeshare;
+package dk.itu.mmad.bikeshare.controller;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +11,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
+
+import dk.itu.mmad.bikeshare.R;
+import dk.itu.mmad.bikeshare.model.Ride;
+import dk.itu.mmad.bikeshare.util.PictureUtils;
 
 public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
 
@@ -46,11 +48,11 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
     public void bind(Ride ride) {
         mRide = ride;
 
-        mBikeNameView.setText(ride.getBikeName());
-        mStartRideView.setText("Start: " + ride.getStartRide());
+        mBikeNameView.setText(ride.getBike().getName());
+        mStartRideView.setText("Start: " + ride.getStartLocation());
 
-        if (ride.getEndRide() != null && !ride.getEndRide().isEmpty()) {
-            mEndRideView.setText("End: " + ride.getEndRide());
+        if (ride.getEndLocation() != null && !ride.getEndLocation().isEmpty()) {
+            mEndRideView.setText("End: " + ride.getEndLocation());
         }
 
         // Show photo if file exists
