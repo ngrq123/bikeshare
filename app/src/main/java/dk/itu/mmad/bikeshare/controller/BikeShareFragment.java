@@ -77,9 +77,7 @@ public class BikeShareFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setVisibility(RecyclerView.GONE);
 
-        mRealm.beginTransaction();
         mAdaptor = new RideAdaptor(mRealm.where(Ride.class).findAllAsync());
-        mRealm.commitTransaction();
 
         mRecyclerView.setAdapter(mAdaptor);
 

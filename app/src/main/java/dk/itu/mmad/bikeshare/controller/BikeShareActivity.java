@@ -89,10 +89,10 @@ public class BikeShareActivity extends AppCompatActivity {
         Realm realm = Realm.getDefaultInstance();
 
         if (realm.isEmpty()) {
+            Log.d(TAG, "Adding some data");
             realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
                 public void execute(Realm realm) {
-
                     realm.insert(new Bike("AAAAAA", "RQ", "Centurion", 1));
                 }
             });

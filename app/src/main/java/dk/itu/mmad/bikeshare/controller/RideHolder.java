@@ -1,10 +1,12 @@
 package dk.itu.mmad.bikeshare.controller;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -18,14 +20,16 @@ import dk.itu.mmad.bikeshare.util.PictureUtils;
 
 public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchListener {
 
+    private static final String TAG = "RideHolder";
+
     private TextView mBikeNameView;
     private TextView mStartRideView;
     private TextView mEndRideView;
 
     private ImageView mBikePhoto;
 
-    private File mPhotoFile;
     private File mFileDir;
+    private File mPhotoFile;
 
     private Ride mRide;
 
@@ -106,7 +110,7 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
             mBikePhoto.setImageDrawable(null);
         } else {
             Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFile.getPath(), itemView.getWidth(), itemView.getHeight());
+                    mPhotoFile.getPath(), (Activity) itemView.getContext());
             mBikePhoto.setImageBitmap(bitmap);
         }
     }

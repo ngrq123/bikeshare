@@ -1,6 +1,9 @@
 package dk.itu.mmad.bikeshare.controller;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -10,10 +13,12 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.Calendar;
@@ -29,6 +34,8 @@ import io.realm.Sort;
 
 public class StartRideActivity extends AppCompatActivity {
 
+    private static final String TAG = "StartRideActivity";
+
     private static final int REQUEST_PHOTO = 0;
 
     // GUI variables
@@ -39,11 +46,7 @@ public class StartRideActivity extends AppCompatActivity {
     private Button mPhotoButton;
     private ImageView mPhotoView;
 
-    // Database
-    private Realm mRealm;
-
-    // Last ride information
-    private Ride mLast = new Ride(-1, "", null, null, null);
+    private String mLastAddedStr;
 
     // Photo file
     private File mPhotoFile;
@@ -54,7 +57,6 @@ public class StartRideActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start_ride);
 
         mLastAdded = (TextView) findViewById(R.id.last_ride);
-        updateUI();
 
         // Texts
         mNewWhat = (TextView) findViewById(R.id.what_text);
@@ -97,43 +99,63 @@ public class StartRideActivity extends AppCompatActivity {
         // Button
         mAddRide = (Button) findViewById(R.id.add_button);
 
-        // Database
-        mRealm = Realm.getDefaultInstance();
-
         // Add ride click event
         mAddRide.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(final View view) {
                 if (mNewWhat.getText().length() > 0 && mNewWhere.getText().length() > 0) {
-                    String bikeName = mNewWhat.getText().toString().trim();
-                    String startRide = mNewWhere.getText().toString().trim();
-                    Date startDate = Calendar.getInstance().getTime();
+                    // Get user inputs
+                    final String bikeName = mNewWhat.getText().toString().trim();
+                    final String startRide = mNewWhere.getText().toString().trim();
+                    final Date startDate = Calendar.getInstance().getTime();
 
-                    mRealm.beginTransaction();
-                    final Bike bike = mRealm.where(Bike.class)
-                            .equalTo("mName", bikeName)
-                            .findFirst();
-                    mRealm.commitTransaction();
+                    try (Realm mRealm = Realm.getDefaultInstance()) {
+                        mRealm.executeTransactionAsync(new Realm.Transaction() {
+                            @Override
+                            public void execute(Realm bgRealm) {
+                                // Find bike in database
+                                Bike bike = bgRealm.where(Bike.class)
+                                        .equalTo("mName", bikeName)
+                                        .findFirst();
 
-                    if (bike == null) {
-                        mLastAdded.setText("Bike is not found");
-                    } else {
-                        mRealm.beginTransaction();
-                        Ride maxIdRide = mRealm.where(Ride.class)
-                                .sort("mId", Sort.DESCENDING)
-                                .findFirst();
-                        int rideId = (maxIdRide == null) ? 1 : (maxIdRide.getId() + 1);
+                                if (bike == null) {
+                                    throw new RuntimeException("Bike is not found.\nPlease select another bike or register a new bike.");
+                                }
 
-                        mLast = new Ride(rideId, startRide, startDate, null, bike);
-                        mRealm.insert(mLast);
-                        mRealm.commitTransaction();
-                        mPhotoFile.renameTo(new File(fileDir, "bike_photo_" + rideId + ".jpg"));
+                                // Check if bike is in use
+                                Ride ride = bgRealm.where(Ride.class)
+                                        .equalTo("mBikeId", bike.getId())
+                                        .sort("mId", Sort.DESCENDING)
+                                        .findFirst();
 
-                        // Reset fields
-                        mNewWhat.setText("");
-                        mNewWhere.setText("");
-                        mPhotoView.setImageDrawable(null);
-                        updateUI();
+                                if (ride != null || (ride != null && ride.getEndLocation() != null)) {
+                                    throw new RuntimeException("Bike is in use.\nPlease select another bike, or register a new bike.");
+                                }
+
+                                // Increment ride id
+                                Ride maxIdRide = bgRealm.where(Ride.class)
+                                        .sort("mId", Sort.DESCENDING)
+                                        .findFirst();
+                                int rideId = (maxIdRide == null) ? 1 : (maxIdRide.getId() + 1);
+
+                                // Create Ride object and insert
+                                ride  = new Ride(rideId, startRide, startDate, null, bike);
+                                bgRealm.insert(ride);
+
+                                mPhotoFile.renameTo(new File(fileDir, "bike_photo_" + ride.getId() + ".jpg"));
+                                mLastAddedStr = ride.toString();
+                            }
+                        }, new Realm.Transaction.OnSuccess() {
+                            @Override
+                            public void onSuccess() {
+                                updateUI();
+                            }
+                        }, new Realm.Transaction.OnError() {
+                            @Override
+                            public void onError(Throwable error) {
+                                showDialogBox(view, error.getMessage());
+                            }
+                        });
                     }
                 }
             }
@@ -157,19 +179,14 @@ public class StartRideActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mRealm != null) {
-            mRealm.close();
-        }
-    }
-
     private void updateUI() {
-        if (mLast.getId() == -1) {
-            mLastAdded.setText("");
-        } else {
-            mLastAdded.setText(mLast.toString());
+        // Reset text and image
+        mNewWhat.setText("");
+        mNewWhere.setText("");
+        mPhotoView.setImageDrawable(null);
+
+        if (mLastAddedStr != null && !mLastAddedStr.isEmpty()) {
+            mLastAdded.setText(mLastAddedStr);
         }
     }
 
@@ -182,5 +199,19 @@ public class StartRideActivity extends AppCompatActivity {
                     mPhotoFile.getPath(), this);
             mPhotoView.setImageBitmap(bitmap);
         }
+    }
+
+    private void showDialogBox(View view, String message) {
+        new AlertDialog.Builder(view.getContext())
+                .setMessage(message)
+                .setCancelable(true)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                })
+                .create()
+                .show();
     }
 }

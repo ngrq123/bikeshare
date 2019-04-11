@@ -1,12 +1,15 @@
 package dk.itu.mmad.bikeshare.controller;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -23,9 +26,6 @@ public class RideDetailActivity extends AppCompatActivity {
     private TextView mEndRide;
 
     private Button mDeleteRide;
-
-    // Database
-    private Realm mRealm;
 
     public static Intent newIntent(Context packageContext, Ride ride) {
         Intent intent = new Intent(packageContext, RideDetailActivity.class);
@@ -46,52 +46,65 @@ public class RideDetailActivity extends AppCompatActivity {
         // Button
         mDeleteRide = (Button) findViewById(R.id.delete_button);
 
-        // Database
-        mRealm = Realm.getDefaultInstance();
+        final int rideId = getIntent().getIntExtra(EXTRA_ID, -1);
 
-        int rideId = getIntent().getIntExtra(EXTRA_ID, -1);
+        if (rideId == -1) {
+            Toast.makeText(this, "No ride found", Toast.LENGTH_SHORT);
+        }
 
-        if (rideId != -1) {
-            mRealm.beginTransaction();
-            final Ride ride = mRealm.where(Ride.class)
-                    .equalTo("mId", rideId)
-                    .findFirst();
-            mRealm.commitTransaction();
-
-            // Set texts
-            mBikeName.setText(ride.getBike().getName());
-            mStartRide.setText(ride.getStartLocation());
-            mEndRide.setText(ride.getEndLocation());
-
-            final File fileDir = this.getFilesDir();
-
-            // Delete ride click event
-            mDeleteRide.setOnClickListener(new View.OnClickListener() {
+        try (Realm realm = Realm.getDefaultInstance()) {
+            realm.executeTransactionAsync(new Realm.Transaction() {
                 @Override
-                public void onClick(View view) {
-                    Intent intent = BikeShareActivity.newIntent(RideDetailActivity.this, ride.toString());
+                public void execute(Realm bgRealm) {
+                    Ride ride = bgRealm.where(Ride.class)
+                            .equalTo("mId", rideId)
+                            .findFirst();
 
-                    // Delete photo if file exists
-                    File photoFile = new File(fileDir, "bike_photo_" + ride.getId()  + ".jpg");
-                    if (photoFile.exists()) {
-                        photoFile.delete();
-                    }
-
-                    mRealm.beginTransaction();
-                    ride.deleteFromRealm();
-                    mRealm.commitTransaction();
-
-                    startActivity(intent);
+                    // Set texts
+                    mBikeName.setText(ride.getBike().getName());
+                    mStartRide.setText(ride.getStartLocation());
+                    mEndRide.setText(ride.getEndLocation());
+                }
+            }, new Realm.Transaction.OnError() {
+                @Override
+                public void onError(Throwable error) {
+                    Toast.makeText(getApplicationContext(), "No ride found", Toast.LENGTH_SHORT);
                 }
             });
         }
-    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mRealm != null) {
-            mRealm.close();
-        }
+        // Delete ride click event
+        mDeleteRide.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try (Realm realm = Realm.getDefaultInstance()) {
+                    realm.executeTransactionAsync(new Realm.Transaction() {
+                        @Override
+                        public void execute(Realm bgRealm) {
+                            Ride ride = bgRealm.where(Ride.class)
+                                    .equalTo("mId", rideId)
+                                    .findFirst();
+
+                            Intent intent = BikeShareActivity.newIntent(RideDetailActivity.this, ride.toString());
+
+                            // Delete photo if file exists
+                            File fileDir = getApplicationContext().getFilesDir();
+                            File photoFile = new File(fileDir, "bike_photo_" + ride.getId() + ".jpg");
+                            if (photoFile.exists()) {
+                                photoFile.delete();
+                            }
+
+                            ride.deleteFromRealm();
+                            startActivity(intent);
+                        }
+                    }, new Realm.Transaction.OnError() {
+                        @Override
+                        public void onError(Throwable error) {
+                            Toast.makeText(getApplicationContext(), "No ride found", Toast.LENGTH_SHORT);
+                        }
+                    });
+                }
+            }
+        });
     }
 }
