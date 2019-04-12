@@ -98,6 +98,7 @@ public class RideDetailActivity extends AppCompatActivity {
                                 photoFile.delete();
                             }
 
+                            ride.getBike().setInUse(false);
                             ride.deleteFromRealm();
 
                             startActivity(intent);
