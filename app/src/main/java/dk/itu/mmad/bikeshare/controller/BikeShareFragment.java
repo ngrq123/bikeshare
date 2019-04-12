@@ -26,6 +26,8 @@ public class BikeShareFragment extends Fragment {
     private static String EXTRA_RIDE_DETAIL = "dk.itu.mmad.bikeshare.EXTRA_RIDE_DETAIL";
 
     // GUI variables
+    private Button mRegisterBike;
+    private Button mListBikes;
     private Button mAddRide;
     private Button mEndRide;
     private Button mListRides;
@@ -41,11 +43,29 @@ public class BikeShareFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedBundleState) {
         View v = inflater.inflate(R.layout.fragment_bike_share, container, false);
         // Buttons
-        mAddRide = (Button) v.findViewById(R.id.add_button);
-        mEndRide = (Button) v.findViewById(R.id.end_button);
+        mRegisterBike = (Button) v.findViewById(R.id.register_bike_button);
+        mListBikes = (Button) v.findViewById(R.id.list_bikes_button);
+        mAddRide = (Button) v.findViewById(R.id.add_ride_button);
+        mEndRide = (Button) v.findViewById(R.id.end_ride_button);
         mListRides = (Button) v.findViewById(R.id.list_rides_button);
 
         // Click events
+        mRegisterBike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), RegisterBikeActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        mListBikes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ListBikesActivity.class);
+                startActivity(intent);
+            }
+        });
+
         mAddRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

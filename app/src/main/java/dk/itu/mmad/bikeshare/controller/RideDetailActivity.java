@@ -85,22 +85,27 @@ public class RideDetailActivity extends AppCompatActivity {
                                     .equalTo("mId", rideId)
                                     .findFirst();
 
+                            if (ride == null) {
+                                throw new RuntimeException("No ride found");
+                            }
+
                             Intent intent = BikeShareActivity.newIntent(RideDetailActivity.this, ride.toString());
 
                             // Delete photo if file exists
                             File fileDir = getApplicationContext().getFilesDir();
-                            File photoFile = new File(fileDir, "bike_photo_" + ride.getId() + ".jpg");
+                            File photoFile = new File(fileDir, "ride_photo_" + ride.getId() + ".jpg");
                             if (photoFile.exists()) {
                                 photoFile.delete();
                             }
 
                             ride.deleteFromRealm();
+
                             startActivity(intent);
                         }
                     }, new Realm.Transaction.OnError() {
                         @Override
                         public void onError(Throwable error) {
-                            Toast.makeText(getApplicationContext(), "No ride found", Toast.LENGTH_SHORT);
+                            Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_SHORT);
                         }
                     });
                 }

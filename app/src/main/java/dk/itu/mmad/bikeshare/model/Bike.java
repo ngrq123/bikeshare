@@ -12,6 +12,7 @@ public class Bike extends RealmObject {
     private String mType;
     private String mPicture;
     private double mPricePerMin;
+    private boolean mIsInUse;
 
     public Bike() {
 
@@ -23,6 +24,7 @@ public class Bike extends RealmObject {
         mType = type;
         mPicture = picture;
         mPricePerMin = pricePerMin;
+        mIsInUse = false;
     }
 
     public Bike(String id, String name, String type, double pricePerMin) {
@@ -55,5 +57,17 @@ public class Bike extends RealmObject {
 
     public void setPricePerMin(double pricePerMin) {
         mPricePerMin = pricePerMin;
+    }
+
+    public boolean isInUse() {
+        return mIsInUse;
+    }
+
+    public void setInUse(boolean inUse) {
+        mIsInUse = inUse;
+    }
+
+    public String toString() {
+        return "Bike " + mName + " (" + mId + ") of " + mType + " type with rental price of " + mPricePerMin + "kr/min";
     }
 }

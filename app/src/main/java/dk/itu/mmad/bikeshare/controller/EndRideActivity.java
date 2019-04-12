@@ -78,6 +78,7 @@ public class EndRideActivity extends AppCompatActivity {
 
                                 ride.setEndLocation(endRide);
                                 ride.setEndDate(endDate);
+                                ride.getBike().setInUse(false);
                                 bgRealm.insertOrUpdate(ride);
 
                                 mLastEndedStr = ride.getBike().getName() + " ended at " +

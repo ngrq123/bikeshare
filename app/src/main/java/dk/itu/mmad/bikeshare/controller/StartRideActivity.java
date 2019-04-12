@@ -123,12 +123,7 @@ public class StartRideActivity extends AppCompatActivity {
                                 }
 
                                 // Check if bike is in use
-                                Ride ride = bgRealm.where(Ride.class)
-                                        .equalTo("mBikeId", bike.getId())
-                                        .sort("mId", Sort.DESCENDING)
-                                        .findFirst();
-
-                                if (ride != null || (ride != null && ride.getEndLocation() != null)) {
+                                if (bike.isInUse()) {
                                     throw new RuntimeException("Bike is in use.\nPlease select another bike, or register a new bike.");
                                 }
 
@@ -139,10 +134,11 @@ public class StartRideActivity extends AppCompatActivity {
                                 int rideId = (maxIdRide == null) ? 1 : (maxIdRide.getId() + 1);
 
                                 // Create Ride object and insert
-                                ride  = new Ride(rideId, startRide, startDate, null, bike);
+                                Ride ride  = new Ride(rideId, startRide, startDate, null, bike);
+                                ride.getBike().setInUse(true);
                                 bgRealm.insert(ride);
 
-                                mPhotoFile.renameTo(new File(fileDir, "bike_photo_" + ride.getId() + ".jpg"));
+                                mPhotoFile.renameTo(new File(fileDir, "ride_photo_" + ride.getId() + ".jpg"));
                                 mLastAddedStr = ride.toString();
                             }
                         }, new Realm.Transaction.OnSuccess() {
@@ -160,23 +156,6 @@ public class StartRideActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    // Adapted from textbook listing 16.12 (page 315)
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (resultCode != Activity.RESULT_OK) {
-            return;
-        }
-
-        if (requestCode == REQUEST_PHOTO) {
-            Uri uri = FileProvider.getUriForFile(this,
-                    "dk.itu.mmad.bikeshare.fileprovider",
-                    mPhotoFile);
-            this.revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-            updatePhotoView();
-        }
     }
 
     private void updateUI() {
