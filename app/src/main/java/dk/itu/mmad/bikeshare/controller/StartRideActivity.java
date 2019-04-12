@@ -63,13 +63,13 @@ public class StartRideActivity extends AppCompatActivity {
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
         // Image and camera button
-        mPhotoView = (ImageView) findViewById(R.id.bike_photo);
+        mPhotoView = (ImageView) findViewById(R.id.ride_photo);
         updatePhotoView();
 
-        mPhotoButton = (Button) findViewById(R.id.bike_camera);
+        mPhotoButton = (Button) findViewById(R.id.ride_camera);
 
         final File fileDir = this.getFilesDir();
-        mPhotoFile = new File(fileDir, "IMG_bike_photo.jpg");
+        mPhotoFile = new File(fileDir, "IMG_ride_photo.jpg");
 
         // From textbook listing 16.8 (page 312)
         final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -166,6 +166,23 @@ public class StartRideActivity extends AppCompatActivity {
 
         if (mLastAddedStr != null && !mLastAddedStr.isEmpty()) {
             mLastAdded.setText(mLastAddedStr);
+        }
+    }
+
+    // Adapted from textbook listing 16.12 (page 315)
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        if (requestCode == REQUEST_PHOTO) {
+            Uri uri = FileProvider.getUriForFile(this,
+                    "dk.itu.mmad.bikeshare.fileprovider",
+                    mPhotoFile);
+            this.revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            updatePhotoView();
         }
     }
 
