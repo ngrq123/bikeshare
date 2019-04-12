@@ -1,5 +1,9 @@
 package dk.itu.mmad.bikeshare.model;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 import io.realm.RealmObject;
@@ -13,6 +17,7 @@ public class Ride extends RealmObject {
     private Date mStartDate;
     private String mEndLocation;
     private Date mEndDate;
+    private byte[] mPicture;
     private User mUser;
     private String mUserEmail;
     private Bike mBike;
@@ -23,13 +28,20 @@ public class Ride extends RealmObject {
     }
 
     public Ride(int id, String startLocation, Date startDate,
-                String endLocation, Date endDate, User user,
+                String endLocation, Date endDate, Bitmap bitmap, User user,
                 Bike bike) {
         mId = id;
         mStartLocation = startLocation;
         mStartDate = startDate;
         mEndLocation = endLocation;
         mEndDate = endDate;
+        mPicture = null;
+        if (bitmap != null) {
+            // Adapted from https://stackoverflow.com/a/7620610
+            ByteArrayOutputStream blob = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.PNG, 0, blob);
+            mPicture = blob.toByteArray();
+        }
         mUser = user;
         mUserEmail = (user == null ? null : user.getEmail());
         mBike = bike;
@@ -37,8 +49,8 @@ public class Ride extends RealmObject {
     }
 
     public Ride(int id, String startLocation, Date startDate,
-                User user, Bike bike) {
-        this(id, startLocation, startDate, null, null, user, bike);
+                Bitmap bitmap, User user, Bike bike) {
+        this(id, startLocation, startDate, null, null, bitmap, user, bike);
     }
 
     public int getId() {
@@ -63,6 +75,14 @@ public class Ride extends RealmObject {
 
     public void setEndDate(Date endDate) {
         mEndDate = endDate;
+    }
+
+    public Bitmap getPicture() {
+        if (mPicture == null || mPicture.length == 0) {
+            return null;
+        }
+
+        return BitmapFactory.decodeByteArray(mPicture, 0, mPicture.length);
     }
 
     public User getUser() {

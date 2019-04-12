@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
@@ -134,11 +135,11 @@ public class StartRideActivity extends AppCompatActivity {
                                 int rideId = (maxIdRide == null) ? 1 : (maxIdRide.getId() + 1);
 
                                 // Create Ride object and insert
-                                Ride ride  = new Ride(rideId, startRide, startDate, null, bike);
+                                Ride ride  = new Ride(rideId, startRide, startDate, toBitmap(), null, bike);
                                 ride.getBike().setInUse(true);
                                 bgRealm.insert(ride);
 
-                                mPhotoFile.renameTo(new File(fileDir, "ride_photo_" + ride.getId() + ".jpg"));
+                                mPhotoFile.delete();
                                 mLastAddedStr = ride.toString();
                             }
                         }, new Realm.Transaction.OnSuccess() {
@@ -209,5 +210,13 @@ public class StartRideActivity extends AppCompatActivity {
                 })
                 .create()
                 .show();
+    }
+
+    private Bitmap toBitmap() {
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            return null;
+        }
+
+        return PictureUtils.getScaledBitmap(mPhotoFile.getPath(), this);
     }
 }

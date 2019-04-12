@@ -59,11 +59,7 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
             mEndRideView.setText("End: " + ride.getEndLocation());
         }
 
-        // Show photo if file exists
-        mPhotoFile = new File(mFileDir, "bike_photo_" + ride.getId()  + ".jpg");
-        if (mPhotoFile.exists()) {
-            showPhoto();
-        }
+        mBikePhoto.setImageBitmap(ride.getPicture());
     }
 
     @Override
@@ -102,16 +98,5 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
         }
 
         return true;
-    }
-
-    // Adapted from textbook listing 16.11 (page 315)
-    private void showPhoto() {
-        if (mPhotoFile == null || !mPhotoFile.exists()) {
-            mBikePhoto.setImageDrawable(null);
-        } else {
-            Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFile.getPath(), (Activity) itemView.getContext());
-            mBikePhoto.setImageBitmap(bitmap);
-        }
     }
 }
