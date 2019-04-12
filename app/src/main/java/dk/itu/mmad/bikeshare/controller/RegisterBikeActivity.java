@@ -88,11 +88,10 @@ public class RegisterBikeActivity extends AppCompatActivity {
                                     throw new RuntimeException("Bike id has been registered.\nPlease check again.");
                                 }
 
-                                bike = new Bike(serialNo, name, type, price);
+                                bike = new Bike(serialNo, name, type, toBitmap(), price);
                                 bgRealm.insert(bike);
 
-                                mPhotoFile.renameTo(new File(fileDir, "bike_photo_" + bike.getId() + ".jpg"));
-
+                                mPhotoFile.delete();
                                 mLastAddedBikeStr = bike.toString();
                             }
                         }, new Realm.Transaction.OnSuccess() {
@@ -182,5 +181,13 @@ public class RegisterBikeActivity extends AppCompatActivity {
                 })
                 .create()
                 .show();
+    }
+
+    private Bitmap toBitmap() {
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            return null;
+        }
+
+        return PictureUtils.getScaledBitmap(mPhotoFile.getPath(), this);
     }
 }

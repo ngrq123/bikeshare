@@ -43,8 +43,6 @@ public class BikeShareActivity extends AppCompatActivity {
         } else {
             attemptLogin();
         }
-
-        init();
     }
 
     private void attemptLogin() {
@@ -82,22 +80,5 @@ public class BikeShareActivity extends AppCompatActivity {
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
-    }
-
-    private void init() {
-        // Add bikes to database if empty
-        Realm realm = Realm.getDefaultInstance();
-
-        if (realm.isEmpty()) {
-            Log.d(TAG, "Adding some data");
-            realm.executeTransactionAsync(new Realm.Transaction() {
-                @Override
-                public void execute(Realm realm) {
-                    realm.insert(new Bike("AAAAAA", "RQ", "Centurion", 1));
-                }
-            });
-        }
-
-        realm.close();
     }
 }

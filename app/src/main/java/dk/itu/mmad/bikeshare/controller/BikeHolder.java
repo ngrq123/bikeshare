@@ -29,9 +29,6 @@ public class BikeHolder extends RecyclerView.ViewHolder {
 
     private ImageView mBikePhoto;
 
-    private File mFileDir;
-    private File mPhotoFile;
-
     public BikeHolder(View itemView) {
         super(itemView);
 
@@ -40,8 +37,6 @@ public class BikeHolder extends RecyclerView.ViewHolder {
         mBikeTypeView = itemView.findViewById(R.id.bike_type);
         mBikePriceView = itemView.findViewById(R.id.bike_price);
         mBikePhoto = itemView.findViewById(R.id.bike_photo);
-
-        mFileDir = itemView.getContext().getFilesDir();
     }
 
     public void bind(Bike bike) {
@@ -50,20 +45,9 @@ public class BikeHolder extends RecyclerView.ViewHolder {
         mBikeTypeView.setText(bike.getType());
         mBikePriceView.setText(bike.getPricePerMin() + " kr/min");
 
-        // Show photo if file exists
-        mPhotoFile = new File(mFileDir, "bike_photo_" + bike.getId()  + ".jpg");
-        if (mPhotoFile.exists()) {
-            showPhoto();
-        }
-    }
+        Bitmap bitmap = bike.getPicture();
 
-    // Adapted from textbook listing 16.11 (page 315)
-    private void showPhoto() {
-        if (mPhotoFile == null || !mPhotoFile.exists()) {
-            mBikePhoto.setImageDrawable(null);
-        } else {
-            Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFile.getPath(), (Activity) itemView.getContext());
+        if (bitmap != null) {
             mBikePhoto.setImageBitmap(bitmap);
         }
     }

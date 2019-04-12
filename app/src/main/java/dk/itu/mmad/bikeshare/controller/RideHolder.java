@@ -59,7 +59,11 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
             mEndRideView.setText("End: " + ride.getEndLocation());
         }
 
-        mBikePhoto.setImageBitmap(ride.getPicture());
+        Bitmap bitmap = ride.getPicture();
+
+        if (bitmap != null) {
+            mBikePhoto.setImageBitmap(bitmap);
+        }
     }
 
     @Override
