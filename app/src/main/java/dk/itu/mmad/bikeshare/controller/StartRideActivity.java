@@ -16,8 +16,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +34,7 @@ import dk.itu.mmad.bikeshare.model.Bike;
 import dk.itu.mmad.bikeshare.model.Ride;
 import dk.itu.mmad.bikeshare.util.PictureUtils;
 import io.realm.Realm;
+import io.realm.RealmBaseAdapter;
 import io.realm.Sort;
 
 public class StartRideActivity extends AppCompatActivity {
@@ -42,11 +46,12 @@ public class StartRideActivity extends AppCompatActivity {
     // GUI variables
     private Button mAddRide;
     private TextView mLastAdded;
-    private TextView mNewWhat;
+    private Spinner mNewWhatSpinner;
     private TextView mNewWhere;
     private Button mPhotoButton;
     private ImageView mPhotoView;
 
+    private String mSelectedBikeId;
     private String mLastAddedStr;
 
     // Photo file
@@ -59,8 +64,28 @@ public class StartRideActivity extends AppCompatActivity {
 
         mLastAdded = (TextView) findViewById(R.id.last_ride);
 
-        // Texts
-        mNewWhat = (TextView) findViewById(R.id.what_text);
+        mNewWhatSpinner = (Spinner) findViewById(R.id.what_text_spinner);
+
+        try (Realm realm = Realm.getDefaultInstance()) {
+            BikeSelectionAdaptor mAdaptor = new BikeSelectionAdaptor(realm.where(Bike.class)
+                    .equalTo("mIsInUse", false)
+                    .findAllAsync());
+            mNewWhatSpinner.setAdapter(mAdaptor);
+
+            mNewWhatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    // https://www.mkyong.com/android/android-spinner-drop-down-list-example/
+                    mSelectedBikeId = ((Bike) adapterView.getItemAtPosition(i)).getId();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                    return;
+                }
+            });
+        }
+
         mNewWhere = (TextView) findViewById(R.id.where_text);
 
         // Image and camera button
@@ -104,11 +129,11 @@ public class StartRideActivity extends AppCompatActivity {
         mAddRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                if (mNewWhat.getText().length() > 0 && mNewWhere.getText().length() > 0) {
+                if (mSelectedBikeId != null && mNewWhere.getText().length() > 0) {
                     // Get user inputs
-                    final String bikeName = mNewWhat.getText().toString().trim();
                     final String startRide = mNewWhere.getText().toString().trim();
                     final Date startDate = Calendar.getInstance().getTime();
+                    Log.d(TAG, mSelectedBikeId);
 
                     try (Realm mRealm = Realm.getDefaultInstance()) {
                         mRealm.executeTransactionAsync(new Realm.Transaction() {
@@ -116,7 +141,7 @@ public class StartRideActivity extends AppCompatActivity {
                             public void execute(Realm bgRealm) {
                                 // Find bike in database
                                 Bike bike = bgRealm.where(Bike.class)
-                                        .equalTo("mName", bikeName)
+                                        .equalTo("mId", mSelectedBikeId)
                                         .findFirst();
 
                                 if (bike == null) {
@@ -161,7 +186,7 @@ public class StartRideActivity extends AppCompatActivity {
 
     private void updateUI() {
         // Reset text and image
-        mNewWhat.setText("");
+//        mNewWhat.setText("");
         mNewWhere.setText("");
         mPhotoView.setImageDrawable(null);
 

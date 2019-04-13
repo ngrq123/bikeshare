@@ -6,7 +6,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -24,9 +26,10 @@ public class EndRideActivity extends AppCompatActivity {
     // GUI variables
     private Button mEndRide;
     private TextView mLastEnded;
-    private TextView mNewWhat;
+    private Spinner mNewWhatSpinner;
     private TextView mNewWhere;
 
+    private String mSelectedBikeId;
     private String mLastEndedStr;
 
     @Override
@@ -39,16 +42,36 @@ public class EndRideActivity extends AppCompatActivity {
         // Button
         mEndRide = (Button) findViewById(R.id.end_button);
 
-        // Texts
-        mNewWhat = (TextView) findViewById(R.id.what_text);
+        mNewWhatSpinner = (Spinner) findViewById(R.id.what_text_spinner);
+
+        try (Realm realm = Realm.getDefaultInstance()) {
+            BikeSelectionAdaptor mAdaptor = new BikeSelectionAdaptor(realm.where(Bike.class)
+                    .equalTo("mIsInUse", true)
+                    .findAllAsync());
+            mNewWhatSpinner.setAdapter(mAdaptor);
+
+            mNewWhatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    // https://www.mkyong.com/android/android-spinner-drop-down-list-example/
+                    mSelectedBikeId = ((Bike) adapterView.getItemAtPosition(i)).getId();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                    return;
+                }
+            });
+        }
+
         mNewWhere = (TextView) findViewById(R.id.where_text);
+
 
         // End ride click event
         mEndRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                if (mNewWhat.getText().length() > 0 && mNewWhere.getText().length() > 0) {
-                    final String bikeName = mNewWhat.getText().toString().trim();
+                if (mNewWhere.getText().length() > 0) {
                     final String endRide = mNewWhere.getText().toString().trim();
                     final Date endDate = Calendar.getInstance().getTime();
 
@@ -58,7 +81,7 @@ public class EndRideActivity extends AppCompatActivity {
                             public void execute(Realm bgRealm) {
                                 // Find bike in database
                                 Bike bike = bgRealm.where(Bike.class)
-                                        .equalTo("mName", bikeName)
+                                        .equalTo("mId", mSelectedBikeId)
                                         .findFirst();
 
                                 if (bike == null) {
@@ -103,7 +126,6 @@ public class EndRideActivity extends AppCompatActivity {
 
     private void updateUI() {
         // Reset text fields
-        mNewWhat.setText("");
         mNewWhere.setText("");
 
         if (mLastEndedStr != null && !mLastEndedStr.isEmpty()) {
