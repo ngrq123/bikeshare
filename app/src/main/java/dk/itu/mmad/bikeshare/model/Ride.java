@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import io.realm.RealmObject;
@@ -117,5 +118,18 @@ public class Ride extends RealmObject {
         }
 
         return rideStr;
+    }
+
+    public double getAmount() {
+        if (mEndDate == null) {
+            return -1;
+        }
+
+        // Calculate difference in dates
+        long diff = mEndDate.getTime() - mStartDate.getTime(); // In milliseconds
+        double minutes = diff / 1000.0 / 60.0;
+
+        // Round up and multiply by rate
+        return Math.ceil(minutes) * mBike.getPricePerMin();
     }
 }

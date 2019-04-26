@@ -12,6 +12,18 @@
         android:layout_margin="24dp" />
 
     <Button
+        android:id="@+id/top_up_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Top Up" />
+
+    <Button
+        android:id="@+id/list_transactions_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="List Transactions" />
+
+    <Button
         android:id="@+id/register_bike_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

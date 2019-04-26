@@ -18,6 +18,8 @@ import java.util.Date;
 import dk.itu.mmad.bikeshare.R;
 import dk.itu.mmad.bikeshare.model.Bike;
 import dk.itu.mmad.bikeshare.model.Ride;
+import dk.itu.mmad.bikeshare.model.Transaction;
+import dk.itu.mmad.bikeshare.model.User;
 import io.realm.Realm;
 import io.realm.Sort;
 
@@ -107,6 +109,13 @@ public class EndRideActivity extends AppCompatActivity {
                                 ride.setEndDate(endDate);
                                 ride.getBike().setInUse(false);
                                 bgRealm.insertOrUpdate(ride);
+
+                                // Add transaction and deduct balance
+                                User user = ride.getUser();
+                                user.deductBalance(ride.getAmount());
+
+                                bgRealm.insert(new Transaction(user, ride.getEndDate(), ride.getAmount(), ride.getBike().getName()));
+                                bgRealm.insertOrUpdate(user);
 
                                 mLastEndedStr = ride.getBike().getName() + " ended at " +
                                         ride.getEndLocation() + " on " + ride.getEndDate();

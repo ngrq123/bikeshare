@@ -30,6 +30,8 @@ public class BikeShareFragment extends Fragment {
 
     // GUI variables
     private TextView mEmail;
+    private Button mTopUp;
+    private Button mListTransactions;
     private Button mRegisterBike;
     private Button mListBikes;
     private Button mAddRide;
@@ -56,6 +58,8 @@ public class BikeShareFragment extends Fragment {
         mEmail.setText(emailText);
 
         // Buttons
+        mTopUp = (Button) v.findViewById(R.id.top_up_button);
+        mListTransactions = (Button) v.findViewById(R.id.list_transactions_button);
         mRegisterBike = (Button) v.findViewById(R.id.register_bike_button);
         mListBikes = (Button) v.findViewById(R.id.list_bikes_button);
         mAddRide = (Button) v.findViewById(R.id.add_ride_button);
@@ -64,6 +68,22 @@ public class BikeShareFragment extends Fragment {
         mLogout = (Button) v.findViewById(R.id.logout_button);
 
         // Click events
+        mTopUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), TopUpActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        mListTransactions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ListTransactionsActivity.class);
+                startActivity(intent);
+            }
+        });
+
         mRegisterBike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
