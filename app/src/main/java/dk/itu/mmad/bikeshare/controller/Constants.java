@@ -6,4 +6,6 @@ final class Constants {
     static final String REALM_BASE_URL = "realms://" + INSTANCE_ADDRESS;
     static final String USERNAME = "rungRealm";
     static final String DB_FILE = "/rungRides";
+
+    static final String PREFERENCE_SHARED_KEY = "dk.itu.mmad.bikeshare";
 }

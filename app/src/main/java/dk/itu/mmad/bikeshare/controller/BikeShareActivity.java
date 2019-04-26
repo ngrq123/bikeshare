@@ -2,6 +2,8 @@ package dk.itu.mmad.bikeshare.controller;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -69,13 +71,22 @@ public class BikeShareActivity extends AppCompatActivity {
                 .fullSynchronization()
                 .build();
         Realm.setDefaultConfiguration(configuration);
+//        Realm.deleteRealm(configuration);
 
         // Continue to app
         FragmentManager fm = getSupportFragmentManager();
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
 
         if (fragment == null) {
-            fragment = new BikeShareFragment();
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            String userEmail = sharedPreferences.getString("user", null);
+
+            if (userEmail == null) {
+                fragment = new LoginFragment();
+            } else {
+                fragment = new BikeShareFragment();
+            }
+
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit();

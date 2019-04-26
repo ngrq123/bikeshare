@@ -2,6 +2,7 @@ package dk.itu.mmad.bikeshare.controller;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -45,8 +46,11 @@ public class EndRideActivity extends AppCompatActivity {
         mNewWhatSpinner = (Spinner) findViewById(R.id.what_text_spinner);
 
         try (Realm realm = Realm.getDefaultInstance()) {
-            BikeSelectionAdaptor mAdaptor = new BikeSelectionAdaptor(realm.where(Bike.class)
-                    .equalTo("mIsInUse", true)
+            RideSelectionAdaptor mAdaptor = new RideSelectionAdaptor(realm.where(Ride.class)
+                    .isNull("mEndLocation")
+                    .and()
+                    .equalTo("mUserEmail", PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                            .getString("user", null))
                     .findAllAsync());
             mNewWhatSpinner.setAdapter(mAdaptor);
 
@@ -54,7 +58,7 @@ public class EndRideActivity extends AppCompatActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                     // https://www.mkyong.com/android/android-spinner-drop-down-list-example/
-                    mSelectedBikeId = ((Bike) adapterView.getItemAtPosition(i)).getId();
+                    mSelectedBikeId = ((Ride) adapterView.getItemAtPosition(i)).getBike().getId();
                 }
 
                 @Override

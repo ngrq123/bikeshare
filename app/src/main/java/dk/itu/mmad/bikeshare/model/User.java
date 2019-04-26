@@ -6,45 +6,45 @@ import io.realm.annotations.PrimaryKey;
 public class User extends RealmObject {
 
     @PrimaryKey
-    private String email;
-    private String password;
-    private double balance;
+    private String mEmail;
+    private String mPassword;
+    private double mBalance;
 
     public User() {
 
     }
 
     public User(String email, String password) {
-        this.email = email;
-        this.password = password;
-        this.balance = 0.0;
+        mEmail = email;
+        mPassword = password;
+        mBalance = 0.0;
     }
 
     public String getEmail() {
-        return email;
+        return mEmail;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        mEmail = email;
     }
 
     public String getPassword() {
-        return password;
+        return mPassword;
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        mPassword = password;
     }
 
     public double getBalance() {
-        return balance;
+        return mBalance;
     }
 
     public void addBalance(double balance) {
-        this.balance += balance;
+        mBalance += balance;
     }
 
     public void deductBalance(double balance) {
-        this.balance -= balance;
+        mBalance -= balance;
     }
 }

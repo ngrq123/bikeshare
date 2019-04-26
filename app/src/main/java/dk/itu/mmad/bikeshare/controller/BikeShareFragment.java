@@ -1,8 +1,11 @@
 package dk.itu.mmad.bikeshare.controller;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,14 +29,17 @@ public class BikeShareFragment extends Fragment {
     private static String EXTRA_RIDE_DETAIL = "dk.itu.mmad.bikeshare.EXTRA_RIDE_DETAIL";
 
     // GUI variables
+    private TextView mEmail;
     private Button mRegisterBike;
     private Button mListBikes;
     private Button mAddRide;
     private Button mEndRide;
     private Button mListRides;
+    private Button mLogout;
     private TextView mBuildVersion;
 
-    // Database, adaptor and list view variables
+    // Shared preferences, database, adaptor and list view variables
+    private SharedPreferences mSharedPreferences;
     private Realm mRealm;
     private RideAdaptor mAdaptor;
     private View mDivider;
@@ -42,12 +48,20 @@ public class BikeShareFragment extends Fragment {
     @Override
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, Bundle savedBundleState) {
         View v = inflater.inflate(R.layout.fragment_bike_share, container, false);
+
+        mEmail = (TextView) v.findViewById(R.id.email_text);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        String emailText = "Welcome\n" + mSharedPreferences.getString("user", null);
+        mEmail.setText(emailText);
+
         // Buttons
         mRegisterBike = (Button) v.findViewById(R.id.register_bike_button);
         mListBikes = (Button) v.findViewById(R.id.list_bikes_button);
         mAddRide = (Button) v.findViewById(R.id.add_ride_button);
         mEndRide = (Button) v.findViewById(R.id.end_ride_button);
         mListRides = (Button) v.findViewById(R.id.list_rides_button);
+        mLogout = (Button) v.findViewById(R.id.logout_button);
 
         // Click events
         mRegisterBike.setOnClickListener(new View.OnClickListener() {
@@ -82,6 +96,15 @@ public class BikeShareFragment extends Fragment {
             }
         });
 
+        mLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSharedPreferences.edit().remove("user").apply();
+                Intent intent = new Intent(getContext(), BikeShareActivity.class);
+                startActivity(intent);
+            }
+        });
+
         // Show build version
         mBuildVersion = (TextView) v.findViewById(R.id.build_version);
         mBuildVersion.setText("API level " + Build.VERSION.SDK_INT);
@@ -97,7 +120,9 @@ public class BikeShareFragment extends Fragment {
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setVisibility(RecyclerView.GONE);
 
-        mAdaptor = new RideAdaptor(mRealm.where(Ride.class).findAllAsync());
+        mAdaptor = new RideAdaptor(mRealm.where(Ride.class)
+                .equalTo("mUserEmail", mSharedPreferences.getString("user", null))
+                .findAllAsync());
 
         mRecyclerView.setAdapter(mAdaptor);
 

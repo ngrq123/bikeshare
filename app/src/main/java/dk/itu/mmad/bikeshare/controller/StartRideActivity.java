@@ -3,6 +3,7 @@ package dk.itu.mmad.bikeshare.controller;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +34,7 @@ import java.util.List;
 import dk.itu.mmad.bikeshare.R;
 import dk.itu.mmad.bikeshare.model.Bike;
 import dk.itu.mmad.bikeshare.model.Ride;
+import dk.itu.mmad.bikeshare.model.User;
 import dk.itu.mmad.bikeshare.util.PictureUtils;
 import io.realm.Realm;
 import io.realm.RealmBaseAdapter;
@@ -133,7 +136,6 @@ public class StartRideActivity extends AppCompatActivity {
                     // Get user inputs
                     final String startRide = mNewWhere.getText().toString().trim();
                     final Date startDate = Calendar.getInstance().getTime();
-                    Log.d(TAG, mSelectedBikeId);
 
                     try (Realm mRealm = Realm.getDefaultInstance()) {
                         mRealm.executeTransactionAsync(new Realm.Transaction() {
@@ -153,14 +155,20 @@ public class StartRideActivity extends AppCompatActivity {
                                     throw new RuntimeException("Bike is in use.\nPlease select another bike, or register a new bike.");
                                 }
 
+                                // Find user in database
+                                User user = bgRealm.where(User.class)
+                                        .equalTo("mEmail", PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                                                .getString("user", null))
+                                        .findFirst();
+
                                 // Increment ride id
                                 Ride maxIdRide = bgRealm.where(Ride.class)
                                         .sort("mId", Sort.DESCENDING)
                                         .findFirst();
                                 int rideId = (maxIdRide == null) ? 1 : (maxIdRide.getId() + 1);
 
-                                // Create Ride object and insert
-                                Ride ride  = new Ride(rideId, startRide, startDate, toBitmap(), null, bike);
+                                // Create Ride object, update bike and insert ride
+                                Ride ride  = new Ride(rideId, startRide, startDate, toBitmap(), user, bike);
                                 ride.getBike().setInUse(true);
                                 bgRealm.insert(ride);
 
