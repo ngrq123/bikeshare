@@ -1,22 +1,13 @@
 package dk.itu.mmad.bikeshare.controller;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.File;
-
 import dk.itu.mmad.bikeshare.R;
 import dk.itu.mmad.bikeshare.model.Bike;
-import dk.itu.mmad.bikeshare.model.Ride;
-import dk.itu.mmad.bikeshare.util.PictureUtils;
 
 public class BikeHolder extends RecyclerView.ViewHolder {
 
@@ -43,7 +34,7 @@ public class BikeHolder extends RecyclerView.ViewHolder {
         mBikeIdView.setText(bike.getId());
         mBikeNameView.setText(bike.getName() + " (" + (bike.isInUse() ? "In Use" : "Free") + ")");
         mBikeTypeView.setText(bike.getType());
-        mBikePriceView.setText(bike.getPricePerMin() + " kr/min");
+        mBikePriceView.setText(bike.getPricePerHr() + " kr/min");
 
         Bitmap bitmap = bike.getPicture();
 

@@ -7,7 +7,6 @@ import java.io.ByteArrayOutputStream;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
-import io.realm.annotations.RealmField;
 
 public class Bike extends RealmObject {
 
@@ -16,14 +15,14 @@ public class Bike extends RealmObject {
     private String mName;
     private String mType;
     private byte[] mPicture;
-    private double mPricePerMin;
+    private double mPricePerHr;
     private boolean mIsInUse;
 
     public Bike() {
 
     }
 
-    public Bike(String id, String name, String type, Bitmap bitmap, double pricePerMin) {
+    public Bike(String id, String name, String type, Bitmap bitmap, double pricePerHr) {
         mId = id;
         mName = name;
         mType = type;
@@ -35,7 +34,7 @@ public class Bike extends RealmObject {
             bitmap.compress(Bitmap.CompressFormat.PNG, 0, blob);
             mPicture = blob.toByteArray();
         }
-        mPricePerMin = pricePerMin;
+        mPricePerHr = pricePerHr;
         mIsInUse = false;
     }
 
@@ -59,12 +58,12 @@ public class Bike extends RealmObject {
         return BitmapFactory.decodeByteArray(mPicture, 0, mPicture.length);
     }
 
-    public double getPricePerMin() {
-        return mPricePerMin;
+    public double getPricePerHr() {
+        return mPricePerHr;
     }
 
-    public void setPricePerMin(double pricePerMin) {
-        mPricePerMin = pricePerMin;
+    public void setPricePerHr(double pricePerHr) {
+        mPricePerHr = pricePerHr;
     }
 
     public boolean isInUse() {
@@ -76,6 +75,6 @@ public class Bike extends RealmObject {
     }
 
     public String toString() {
-        return "Bike " + mName + " (" + mId + ") of " + mType + " type with rental price of " + mPricePerMin + "kr/min";
+        return "Bike " + mName + " (" + mId + ") of " + mType + " type with rental price of " + mPricePerHr + " kr/hr";
     }
 }

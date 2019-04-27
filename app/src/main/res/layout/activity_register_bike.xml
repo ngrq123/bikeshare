@@ -79,7 +79,7 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="Price (per min)" />
+            android:text="Price (per hr)" />
 
         <EditText
             android:id="@+id/price_text"
