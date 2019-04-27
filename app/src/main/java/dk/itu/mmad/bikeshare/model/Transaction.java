@@ -28,7 +28,7 @@ public class Transaction extends RealmObject {
         mAmount = bikeName == null ? amount : amount * -1;
         mBikeName = bikeName;
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
         mId = mUserEmail + simpleDateFormat.format(mDate);
     }
 

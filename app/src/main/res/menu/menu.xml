@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/top_up"
+        android:title="Top Up" />
+    <item android:id="@+id/list_transactions"
+        android:title="List Transactions" />
+    <item android:id="@+id/register_bike"
+        android:title="Register Bike" />
+    <item android:id="@+id/list_bikes"
+        android:title="List Bikes" />
+    <item android:id="@+id/logout"
+        android:title="Logout" />
+</menu>

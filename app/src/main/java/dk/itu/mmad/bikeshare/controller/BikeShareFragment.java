@@ -8,8 +8,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -30,14 +34,9 @@ public class BikeShareFragment extends Fragment {
 
     // GUI variables
     private TextView mEmail;
-    private Button mTopUp;
-    private Button mListTransactions;
-    private Button mRegisterBike;
-    private Button mListBikes;
     private Button mAddRide;
     private Button mEndRide;
     private Button mListRides;
-    private Button mLogout;
     private TextView mBuildVersion;
 
     // Shared preferences, database, adaptor and list view variables
@@ -58,48 +57,11 @@ public class BikeShareFragment extends Fragment {
         mEmail.setText(emailText);
 
         // Buttons
-        mTopUp = (Button) v.findViewById(R.id.top_up_button);
-        mListTransactions = (Button) v.findViewById(R.id.list_transactions_button);
-        mRegisterBike = (Button) v.findViewById(R.id.register_bike_button);
-        mListBikes = (Button) v.findViewById(R.id.list_bikes_button);
         mAddRide = (Button) v.findViewById(R.id.add_ride_button);
         mEndRide = (Button) v.findViewById(R.id.end_ride_button);
         mListRides = (Button) v.findViewById(R.id.list_rides_button);
-        mLogout = (Button) v.findViewById(R.id.logout_button);
 
         // Click events
-        mTopUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), TopUpActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        mListTransactions.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), ListTransactionsActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        mRegisterBike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), RegisterBikeActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        mListBikes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getContext(), ListBikesActivity.class);
-                startActivity(intent);
-            }
-        });
-
         mAddRide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -112,15 +74,6 @@ public class BikeShareFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getContext(), EndRideActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        mLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mSharedPreferences.edit().remove("user").apply();
-                Intent intent = new Intent(getContext(), BikeShareActivity.class);
                 startActivity(intent);
             }
         });
@@ -172,7 +125,46 @@ public class BikeShareFragment extends Fragment {
             }
         }
 
+        // Popup Menu
+
+
         return v;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Class<?> clazz;
+
+        switch(item.getItemId()) {
+            case R.id.top_up:
+                clazz = TopUpActivity.class;
+                break;
+            case R.id.list_transactions:
+                clazz = ListTransactionsActivity.class;
+                break;
+            case R.id.register_bike:
+                clazz = RegisterBikeActivity.class;
+                break;
+            case R.id.list_bikes:
+                clazz = ListBikesActivity.class;
+                break;
+            case R.id.logout:
+                mSharedPreferences.edit().remove("user").apply();
+                clazz = BikeShareActivity.class;
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+        Intent intent = new Intent(getContext(), clazz);
+        startActivity(intent);
+        return true;
     }
 
     @Override
@@ -194,5 +186,6 @@ public class BikeShareFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 }

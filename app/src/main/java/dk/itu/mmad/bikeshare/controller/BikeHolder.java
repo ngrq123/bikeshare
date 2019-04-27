@@ -34,7 +34,7 @@ public class BikeHolder extends RecyclerView.ViewHolder {
         mBikeIdView.setText(bike.getId());
         mBikeNameView.setText(bike.getName() + " (" + (bike.isInUse() ? "In Use" : "Free") + ")");
         mBikeTypeView.setText(bike.getType());
-        mBikePriceView.setText(bike.getPricePerHr() + " kr/min");
+        mBikePriceView.setText(bike.getPricePerHr() + " kr/hr");
 
         Bitmap bitmap = bike.getPicture();
 

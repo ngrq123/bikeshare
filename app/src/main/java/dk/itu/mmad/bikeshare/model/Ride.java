@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Date;
 
 import io.realm.RealmObject;
@@ -129,6 +132,11 @@ public class Ride extends RealmObject {
         double hours = diff / 1000.0 / 60.0 / 60.0;
 
         // Multiply by rate
-        return hours * mBike.getPricePerHr();
+        double amount = hours * mBike.getPricePerHr();
+
+        // Adapted from https://stackoverflow.com/a/2808648
+        BigDecimal bd = new BigDecimal(amount);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }
