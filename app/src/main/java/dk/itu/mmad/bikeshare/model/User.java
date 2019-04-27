@@ -24,18 +24,6 @@ public class User extends RealmObject {
         return mEmail;
     }
 
-    public void setEmail(String email) {
-        mEmail = email;
-    }
-
-    public String getPassword() {
-        return mPassword;
-    }
-
-    public void setPassword(String password) {
-        mPassword = password;
-    }
-
     public double getBalance() {
         return mBalance;
     }

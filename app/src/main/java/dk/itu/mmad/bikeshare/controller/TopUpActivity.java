@@ -66,7 +66,7 @@ public class TopUpActivity extends AppCompatActivity {
                             double amount = Double.parseDouble(amountText);
                             user.addBalance(amount);
 
-                            bgRealm.insert(new Transaction(user, Calendar.getInstance().getTime(), amount));
+                            bgRealm.insert(new Transaction(user.getEmail(), amount));
                             bgRealm.insertOrUpdate(user);
                         }
                     }, new Realm.Transaction.OnSuccess() {

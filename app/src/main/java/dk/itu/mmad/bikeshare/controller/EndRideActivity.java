@@ -141,12 +141,16 @@ public class EndRideActivity extends AppCompatActivity {
                                 bgRealm.insertOrUpdate(ride);
                                 bgRealm.insertOrUpdate(bike);
 
-                                // Add transaction and deduct balance
                                 User user = ride.getUser();
-                                user.deductBalance(ride.getAmount());
 
-                                bgRealm.insert(new Transaction(user, ride.getEndDate(), ride.getAmount(), ride.getBike().getName()));
-                                bgRealm.insertOrUpdate(user);
+                                if (!ride.getBike().getUserEmail().equals(user.getEmail())) {
+                                    // Add transaction and deduct balance
+                                    user.deductBalance(ride.getAmount());
+
+                                    bgRealm.insert(new Transaction(user.getEmail(), ride.getAmount(), ride.getBike()));
+                                    bgRealm.insert(new Transaction(bike.getUserEmail(), ride.getAmount(), ride.getBike()));
+                                    bgRealm.insertOrUpdate(user);
+                                }
 
                                 mLastEndedStr = ride.getBike().getName() + " ended at " +
                                         ride.getEndLocation() + " on " + ride.getEndDate();

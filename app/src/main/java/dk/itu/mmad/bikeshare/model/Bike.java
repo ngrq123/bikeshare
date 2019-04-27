@@ -21,14 +21,15 @@ public class Bike extends RealmObject {
     private byte[] mPicture;
     private double mLongitude;
     private double mLatitude;
+    private String mUserEmail;
 
     public Bike() {
 
     }
 
     public Bike(String id, String name, String type,
-                double pricePerHr, String location, Bitmap bitmap,
-                double longitude, double latitude) {
+                double pricePerHr, String location, String userEmail,
+                Bitmap bitmap, double longitude, double latitude) {
         mId = id;
         mName = name;
         mType = type;
@@ -46,6 +47,8 @@ public class Bike extends RealmObject {
 
         mLongitude = longitude;
         mLatitude = latitude;
+
+        mUserEmail = userEmail;
     }
 
     public String getId() {
@@ -62,6 +65,10 @@ public class Bike extends RealmObject {
 
     public double getPricePerHr() {
         return mPricePerHr;
+    }
+
+    public String getUserEmail() {
+        return mUserEmail;
     }
 
     public Bitmap getPicture() {

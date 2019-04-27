@@ -11,29 +11,36 @@ public class Transaction extends RealmObject {
 
     @PrimaryKey
     private String mId;
-    private User mUser;
     private String mUserEmail;
     private Date mDate;
     private double mAmount;
-    private String mBikeName;
+    private String mDescription;
+    private Bike mBike;
 
     public Transaction() {
 
     }
 
-    public Transaction(User user, Date date, double amount, String bikeName) {
-        mUser = user;
-        mUserEmail = (user == null ? null : user.getEmail());
-        mDate = date;
-        mAmount = bikeName == null ? amount : amount * -1;
-        mBikeName = bikeName;
+    public Transaction(String userEmail, double amount, Bike bike) {
+        mUserEmail = userEmail;
+        mDate = Calendar.getInstance().getTime();
+        mAmount = (bike == null || bike.getUserEmail().equals(userEmail)) ? amount : amount * -1;
+        mBike = bike;
+
+        if (bike == null) {
+            mDescription = "Top Up";
+        } else if (mUserEmail.equals(bike.getUserEmail())) {
+            mDescription = "Credit from Usage of " + bike.getName();
+        } else {
+            mDescription = "Ended ride on " + bike.getName();
+        }
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-        mId = mUserEmail + simpleDateFormat.format(mDate);
+        mId = mUserEmail.substring(0, mUserEmail.indexOf("@")) + (bike == null ? "" : bike.getId()) + simpleDateFormat.format(mDate);
     }
 
-    public Transaction(User user, Date date, double amount) {
-        this(user, date, amount, null);
+    public Transaction(String userEmail, double amount) {
+        this(userEmail, amount, null);
     }
 
     public String getId() {
@@ -44,47 +51,11 @@ public class Transaction extends RealmObject {
         mId = id;
     }
 
-    public User getUser() {
-        return mUser;
-    }
-
-    public void setUser(User user) {
-        mUser = user;
-    }
-
-    public String getUserEmail() {
-        return mUserEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        mUserEmail = userEmail;
-    }
-
-    public Date getDate() {
-        return mDate;
-    }
-
-    public void setDate(Date date) {
-        mDate = date;
-    }
-
     public double getAmount() {
         return mAmount;
     }
 
-    public void setAmount(double amount) {
-        mAmount = amount;
-    }
-
-    public String getBikeName() {
-        return mBikeName;
-    }
-
-    public void setBikeName(String bikeName) {
-        mBikeName = bikeName;
-    }
-
     public String getDescription() {
-        return mBikeName == null ? "Top Up" : "Ended ride on " + mBikeName;
+        return mDescription;
     }
 }

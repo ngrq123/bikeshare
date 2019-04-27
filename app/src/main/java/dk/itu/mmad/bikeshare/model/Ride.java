@@ -131,16 +131,8 @@ public class Ride extends RealmObject {
         return mUser;
     }
 
-    public String getUserEmail() {
-        return mUserEmail;
-    }
-
     public Bike getBike() {
         return mBike;
-    }
-
-    public String getBikeId() {
-        return mBikeId;
     }
 
     public String toString() {

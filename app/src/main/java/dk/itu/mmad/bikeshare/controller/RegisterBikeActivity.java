@@ -13,6 +13,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
@@ -123,9 +124,12 @@ public class RegisterBikeActivity extends AppCompatActivity {
                                     throw new RuntimeException("Bike id has been registered.\nPlease check again.");
                                 }
 
+                                String userEmail = PreferenceManager.getDefaultSharedPreferences(view.getContext())
+                                        .getString("user", null);
+
                                 bike = new Bike(serialNo, name, type,
-                                        price, location, toBitmap(),
-                                        mLongitude, mLatitude);
+                                        price, location, userEmail,
+                                        toBitmap(), mLongitude, mLatitude);
                                 bgRealm.insert(bike);
 
                                 mPhotoFile.delete();

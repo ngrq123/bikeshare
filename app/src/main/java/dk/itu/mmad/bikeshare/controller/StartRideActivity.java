@@ -184,8 +184,8 @@ public class StartRideActivity extends AppCompatActivity {
                                                 .getString("user", null))
                                         .findFirst();
 
-                                // Check account balance
-                                if (user.getBalance() <= 0.0) {
+                                // Check account balance if bike is not user's
+                                if (!bike.getUserEmail().equals(user.getEmail()) && user.getBalance() <= 0.0) {
                                     throw new RuntimeException("Balance is too low.\nPlease top up.");
                                 }
 
