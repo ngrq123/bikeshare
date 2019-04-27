@@ -11,17 +11,24 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp" />
 
-    <Button
-        android:id="@+id/add_ride_button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add ride" />
+        android:gravity="center">
 
-    <Button
-        android:id="@+id/end_ride_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="End ride" />
+        <Button
+            android:id="@+id/add_ride_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add ride" />
+
+        <Button
+            android:id="@+id/end_ride_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="End ride" />
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/list_rides_button"
