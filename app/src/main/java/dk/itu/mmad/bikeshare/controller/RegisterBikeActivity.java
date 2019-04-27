@@ -1,5 +1,6 @@
 package dk.itu.mmad.bikeshare.controller;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -7,8 +8,13 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,12 +23,23 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 import dk.itu.mmad.bikeshare.R;
 import dk.itu.mmad.bikeshare.model.Bike;
 import dk.itu.mmad.bikeshare.util.PictureUtils;
+import dk.itu.mmad.bikeshare.util.ValidationUtils;
 import io.realm.Realm;
 
 public class RegisterBikeActivity extends AppCompatActivity {
@@ -33,6 +50,7 @@ public class RegisterBikeActivity extends AppCompatActivity {
     private TextView mName;
     private TextView mType;
     private TextView mPrice;
+    private TextView mLocation;
     private ImageView mPhotoView;
     private Button mPhotoButton;
     private Button mRegisterButton;
@@ -41,6 +59,14 @@ public class RegisterBikeActivity extends AppCompatActivity {
     private File mPhotoFile;
 
     private String mLastAddedBikeStr;
+
+    // Location
+    private static ArrayList<String> mPermissions = new ArrayList<>();
+    private static final int ALL_PERMISSIONS_RESULT = 1011;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
+    private LocationCallback mLocationCallback;
+    private double mLongitude = -1;
+    private double mLatitude = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +77,7 @@ public class RegisterBikeActivity extends AppCompatActivity {
         mName = (TextView) findViewById(R.id.name_text);
         mType = (TextView) findViewById(R.id.type_text);
         mPrice = (TextView) findViewById(R.id.price_text);
+        mLocation = (TextView) findViewById(R.id.location_text);
 
         mPhotoView = (ImageView) findViewById(R.id.bike_photo);
         updatePhotoView();
@@ -60,22 +87,30 @@ public class RegisterBikeActivity extends AppCompatActivity {
         mPhotoFile = new File(fileDir, "IMG_bike_photo.jpg");
         setUpPhotoTaking();
 
+        // Location
+        getLocationCoordinates();
+
         // Button
         mRegisterButton = (Button) findViewById(R.id.register_button);
 
         mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                try (Realm realm = Realm.getDefaultInstance()) {
-                    if (mSerialNo.getText().length() > 0 &&
-                            mName.getText().length() > 0 &&
-                            mType.getText().length() > 0 &&
-                            mPrice.getText().length() > 0) {
-                        final String serialNo = mSerialNo.getText().toString().trim();
-                        final String name = mName.getText().toString().trim();
-                        final String type = mType.getText().toString().trim();
-                        final double price = Double.parseDouble(mPrice.getText().toString().trim());
+                final String serialNo = mSerialNo.getText().toString().trim();
+                final String name = mName.getText().toString().trim();
+                final String type = mType.getText().toString().trim();
+                String priceStr = mPrice.getText().toString().trim();
+                final String location = mLocation.getText().toString().trim();
 
+                if (serialNo.length() > 0 &&
+                        name.length() > 0 &&
+                        type.length() > 0 &&
+                        ValidationUtils.isValidDouble(priceStr) &&
+                        location.length() > 0) {
+
+                    final double price = Double.parseDouble(priceStr);
+
+                    try (Realm realm = Realm.getDefaultInstance()) {
                         // Check if serial number is already registered
                         realm.executeTransactionAsync(new Realm.Transaction() {
                             @Override
@@ -88,7 +123,9 @@ public class RegisterBikeActivity extends AppCompatActivity {
                                     throw new RuntimeException("Bike id has been registered.\nPlease check again.");
                                 }
 
-                                bike = new Bike(serialNo, name, type, toBitmap(), price);
+                                bike = new Bike(serialNo, name, type,
+                                        price, location, toBitmap(),
+                                        mLongitude, mLatitude);
                                 bgRealm.insert(bike);
 
                                 mPhotoFile.delete();
@@ -106,8 +143,6 @@ public class RegisterBikeActivity extends AppCompatActivity {
                             }
                         });
                     }
-                } catch (NumberFormatException e) {
-                    showDialogBox(view, "Please enter a valid price.");
                 }
             }
         });
@@ -129,6 +164,18 @@ public class RegisterBikeActivity extends AppCompatActivity {
             this.revokeUriPermission(uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             updatePhotoView();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        stopLocationUpdates();
     }
 
     // From textbook listing 16.11 (page 315)
@@ -190,4 +237,91 @@ public class RegisterBikeActivity extends AppCompatActivity {
 
         return PictureUtils.getScaledBitmap(mPhotoFile.getPath(), this);
     }
+
+    private void getLocationCoordinates() {
+        mPermissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        mPermissions.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        ArrayList<String> permissionsToRequest = permissionsToRequest(mPermissions);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (permissionsToRequest.size() > 0) {
+                requestPermissions(permissionsToRequest.toArray(
+                        new String[permissionsToRequest.size()]),
+                        ALL_PERMISSIONS_RESULT);
+            }
+        }
+
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) return;
+                for (Location location : locationResult.getLocations()) {
+                    mLongitude = location.getLongitude();
+                    mLatitude = location.getLatitude();
+                }
+            }
+        };
+
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+    }
+
+    private ArrayList<String> permissionsToRequest(ArrayList<String> permissions) {
+        ArrayList<String> result = new ArrayList<>();
+        for (String permission : permissions)
+            if (!hasPermission(permission))
+                result.add(permission);
+        return result;
+    }
+
+    private boolean hasPermission(String permission) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return Objects.requireNonNull(this).checkSelfPermission(permission) ==
+                    PackageManager.PERMISSION_GRANTED;
+        }
+        return true;
+    }
+
+    private boolean checkPermission() {
+        return (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void startLocationUpdates() {
+        if (checkPermission()) {
+            return;
+        }
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(5000);
+        locationRequest.setFastestInterval(5000);
+        mFusedLocationProviderClient.requestLocationUpdates(locationRequest, mLocationCallback, null);
+    }
+
+    private void stopLocationUpdates() {
+        mFusedLocationProviderClient.removeLocationUpdates(mLocationCallback);
+    }
+
+//    private String getAddress(double longitude, double latitude) {
+//        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+//        StringBuilder stringBuilder = new StringBuilder();
+//        try {
+//            List<Address> addresses =
+//                    geocoder.getFromLocation(latitude, longitude, 1);
+//            if (addresses.size() > 0) {
+//                Address address = addresses.get(0);
+//                stringBuilder.append(address.getAddressLine(0)).append("\n");
+//                stringBuilder.append(address.getLocality()).append("\n");
+//                stringBuilder.append(address.getPostalCode()).append("\n");
+//                stringBuilder.append(address.getCountryName());
+//            } else {
+//                return "No address found";
+//            }
+//        } catch (IOException ex) {
+//            return ex.getMessage();
+//        }
+//        return stringBuilder.toString();
+//    }
 }

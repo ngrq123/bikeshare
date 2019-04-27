@@ -2,6 +2,7 @@ package dk.itu.mmad.bikeshare.model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 
 import java.io.ByteArrayOutputStream;
 
@@ -14,19 +15,27 @@ public class Bike extends RealmObject {
     private String mId;
     private String mName;
     private String mType;
-    private byte[] mPicture;
     private double mPricePerHr;
+    private String mLocation;
     private boolean mIsInUse;
+    private byte[] mPicture;
+    private double mLongitude;
+    private double mLatitude;
 
     public Bike() {
 
     }
 
-    public Bike(String id, String name, String type, Bitmap bitmap, double pricePerHr) {
+    public Bike(String id, String name, String type,
+                double pricePerHr, String location, Bitmap bitmap,
+                double longitude, double latitude) {
         mId = id;
         mName = name;
         mType = type;
-        mPicture = null;
+        mPricePerHr = pricePerHr;
+        mLocation = location;
+        mIsInUse = false;
+
         mPicture = null;
         if (bitmap != null) {
             // Adapted from https://stackoverflow.com/a/7620610
@@ -34,8 +43,9 @@ public class Bike extends RealmObject {
             bitmap.compress(Bitmap.CompressFormat.PNG, 0, blob);
             mPicture = blob.toByteArray();
         }
-        mPricePerHr = pricePerHr;
-        mIsInUse = false;
+
+        mLongitude = longitude;
+        mLatitude = latitude;
     }
 
     public String getId() {
@@ -50,20 +60,16 @@ public class Bike extends RealmObject {
         return mType;
     }
 
+    public double getPricePerHr() {
+        return mPricePerHr;
+    }
+
     public Bitmap getPicture() {
         if (mPicture == null || mPicture.length == 0) {
             return null;
         }
 
         return BitmapFactory.decodeByteArray(mPicture, 0, mPicture.length);
-    }
-
-    public double getPricePerHr() {
-        return mPricePerHr;
-    }
-
-    public void setPricePerHr(double pricePerHr) {
-        mPricePerHr = pricePerHr;
     }
 
     public boolean isInUse() {
@@ -74,7 +80,41 @@ public class Bike extends RealmObject {
         mIsInUse = inUse;
     }
 
+    public String getLocation() {
+        return mLocation;
+    }
+
+    public void setLocation(String location) {
+        mLocation = location;
+    }
+
+    public double getLongitude() {
+        return mLongitude;
+    }
+
+    public void setLongitude(double longitude) {
+        mLongitude = longitude;
+    }
+
+    public double getLatitude() {
+        return mLatitude;
+    }
+
+    public void setLatitude(double latitude) {
+        mLatitude = latitude;
+    }
+
+    public boolean isLocationKnown() {
+        return mLongitude != -1 && mLatitude != -1;
+    }
+
     public String toString() {
-        return "Bike " + mName + " (" + mId + ") of " + mType + " type with rental price of " + mPricePerHr + " kr/hr";
+        String bikeStr = "The " + mType + " bike " + mName + " (" + mId + ") with rental price of " + mPricePerHr + " kr/hr is at " + mLocation;
+
+        if (isLocationKnown()) {
+            bikeStr += " (" + mLongitude + ", " + mLatitude + ")";
+        }
+
+        return bikeStr;
     }
 }

@@ -53,10 +53,19 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
         mRide = ride;
 
         mBikeNameView.setText(ride.getBike().getName());
-        mStartRideView.setText("Start: " + ride.getStartLocation());
+
+        String startRideText = "Start: " + ride.getStartLocation();
+        if (ride.isStartLocationKnown()) {
+            startRideText += "\n(" + ride.getStartLongitude() + ", " + ride.getStartLatitude() + ")";
+        }
+        mStartRideView.setText(startRideText);
 
         if (ride.getEndLocation() != null && !ride.getEndLocation().isEmpty()) {
-            mEndRideView.setText("End: " + ride.getEndLocation());
+            String endRideText = "End: " + ride.getEndLocation();
+            if (ride.isEndLocationKnown()) {
+                endRideText += "\n(" + ride.getEndLongitude() + ", " + ride.getEndLatitude() + ")";
+            }
+            mEndRideView.setText(endRideText);
         }
 
         Bitmap bitmap = ride.getPicture();

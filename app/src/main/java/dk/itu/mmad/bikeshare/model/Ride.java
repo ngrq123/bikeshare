@@ -18,8 +18,12 @@ public class Ride extends RealmObject {
     private int mId;
     private String mStartLocation;
     private Date mStartDate;
+    private double mStartLongitude;
+    private double mStartLatitude;
     private String mEndLocation;
     private Date mEndDate;
+    private double mEndLongitude;
+    private double mEndLatitude;
     private byte[] mPicture;
     private User mUser;
     private String mUserEmail;
@@ -30,14 +34,20 @@ public class Ride extends RealmObject {
 
     }
 
-    public Ride(int id, String startLocation, Date startDate,
-                String endLocation, Date endDate, Bitmap bitmap, User user,
-                Bike bike) {
+    private Ride(int id, String startLocation, Date startDate,
+                double startLongitude, double startLatitude, String endLocation,
+                Date endDate, double endLongitude, double endLatitude, Bitmap bitmap,
+                User user, Bike bike) {
         mId = id;
         mStartLocation = startLocation;
         mStartDate = startDate;
+        mStartLongitude = startLongitude;
+        mStartLatitude = startLatitude;
         mEndLocation = endLocation;
         mEndDate = endDate;
+        mEndLongitude = endLongitude;
+        mEndLatitude = endLatitude;
+
         mPicture = null;
         if (bitmap != null) {
             // Adapted from https://stackoverflow.com/a/7620610
@@ -45,6 +55,7 @@ public class Ride extends RealmObject {
             bitmap.compress(Bitmap.CompressFormat.PNG, 0, blob);
             mPicture = blob.toByteArray();
         }
+
         mUser = user;
         mUserEmail = (user == null ? null : user.getEmail());
         mBike = bike;
@@ -52,8 +63,12 @@ public class Ride extends RealmObject {
     }
 
     public Ride(int id, String startLocation, Date startDate,
-                Bitmap bitmap, User user, Bike bike) {
-        this(id, startLocation, startDate, null, null, bitmap, user, bike);
+                double startLongitude, double startLatitude, Bitmap bitmap,
+                User user, Bike bike) {
+        this(id, startLocation, startDate,
+                startLongitude, startLatitude, null,
+                null, -1, -1,
+                bitmap, user, bike);
     }
 
     public int getId() {
@@ -62,6 +77,14 @@ public class Ride extends RealmObject {
 
     public String getStartLocation() {
         return mStartLocation;
+    }
+
+    public double getStartLongitude() {
+        return mStartLongitude;
+    }
+
+    public double getStartLatitude() {
+        return mStartLatitude;
     }
 
     public String getEndLocation() {
@@ -78,6 +101,22 @@ public class Ride extends RealmObject {
 
     public void setEndDate(Date endDate) {
         mEndDate = endDate;
+    }
+
+    public double getEndLongitude() {
+        return mEndLongitude;
+    }
+
+    public void setEndLongitude(double endLongitude) {
+        mEndLongitude = endLongitude;
+    }
+
+    public double getEndLatitude() {
+        return mEndLatitude;
+    }
+
+    public void setEndLatitude(double endLatitude) {
+        mEndLatitude = endLatitude;
     }
 
     public Bitmap getPicture() {
@@ -138,5 +177,13 @@ public class Ride extends RealmObject {
         BigDecimal bd = new BigDecimal(amount);
         bd = bd.setScale(2, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    public boolean isStartLocationKnown() {
+        return mStartLongitude != -1 && mStartLatitude != -1;
+    }
+
+    public boolean isEndLocationKnown() {
+        return mEndLongitude != -1 && mEndLatitude != -1;
     }
 }
