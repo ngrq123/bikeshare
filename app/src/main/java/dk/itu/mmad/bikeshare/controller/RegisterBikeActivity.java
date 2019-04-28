@@ -103,10 +103,13 @@ public class RegisterBikeActivity extends AppCompatActivity {
                 String priceStr = mPrice.getText().toString().trim();
                 final String location = mLocation.getText().toString().trim();
 
+                if (!ValidationUtils.isValidDouble(priceStr)) {
+                    showDialogBox(view, "Enter a valid price.");
+                }
+
                 if (serialNo.length() > 0 &&
                         name.length() > 0 &&
                         type.length() > 0 &&
-                        ValidationUtils.isValidDouble(priceStr) &&
                         location.length() > 0) {
 
                     final double price = Double.parseDouble(priceStr);

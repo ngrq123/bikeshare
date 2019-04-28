@@ -62,7 +62,7 @@ public class LoginFragment extends Fragment {
                                     .findFirst();
 
                             if (user == null) {
-                                throw new RuntimeException("User not found");
+                                throw new RuntimeException("User not found.");
                             }
 
 

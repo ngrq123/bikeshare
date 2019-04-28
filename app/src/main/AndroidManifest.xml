@@ -15,13 +15,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".controller.ListTransactionsActivity"></activity>
-        <activity android:name=".controller.TopUpActivity"></activity>
-        <activity android:name=".controller.ListBikesActivity" />
-        <activity android:name=".controller.RegisterBikeActivity" />
-        <activity android:name=".controller.RideDetailActivity" />
-        <activity android:name=".controller.EndRideActivity" />
-        <activity android:name=".controller.StartRideActivity" />
+        <activity android:name=".controller.ListTransactionsActivity"
+            android:parentActivityName=".controller.BikeShareActivity" />
+        <activity android:name=".controller.TopUpActivity"
+            android:parentActivityName=".controller.BikeShareActivity" />
+        <activity android:name=".controller.ListBikesActivity"
+            android:parentActivityName=".controller.BikeShareActivity" />
+        <activity android:name=".controller.RegisterBikeActivity"
+            android:parentActivityName=".controller.BikeShareActivity"/>
+        <activity android:name=".controller.RideDetailActivity"
+            android:parentActivityName=".controller.BikeShareActivity"/>
+        <activity android:name=".controller.EndRideActivity"
+            android:parentActivityName=".controller.BikeShareActivity"/>
+        <activity android:name=".controller.StartRideActivity"
+            android:parentActivityName=".controller.BikeShareActivity"/>
         <activity android:name=".controller.BikeShareActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

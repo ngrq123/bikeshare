@@ -125,9 +125,6 @@ public class BikeShareFragment extends Fragment {
             }
         }
 
-        // Popup Menu
-
-
         return v;
     }
 
