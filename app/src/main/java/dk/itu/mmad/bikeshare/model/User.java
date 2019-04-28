@@ -1,5 +1,8 @@
 package dk.itu.mmad.bikeshare.model;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -25,6 +28,10 @@ public class User extends RealmObject {
     }
 
     public double getBalance() {
+        // Adapted from https://stackoverflow.com/a/2808648
+        BigDecimal bd = new BigDecimal(mBalance);
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+        mBalance = bd.doubleValue();
         return mBalance;
     }
 

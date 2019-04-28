@@ -27,7 +27,7 @@ public class Transaction extends RealmObject {
 
         if (mAmount > 0 && bikeOwnerEmail == null) {
             mDescription = "Top Up";
-        } else if (!mUserEmail.equals(bikeOwnerEmail)) {
+        } else if (mUserEmail.equals(bikeOwnerEmail)) {
             mDescription = "Credit from Usage of " + bikeName;
         } else {
             mDescription = "Ended ride on " + bikeName;
