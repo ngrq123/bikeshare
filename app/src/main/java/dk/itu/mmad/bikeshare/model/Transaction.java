@@ -25,9 +25,9 @@ public class Transaction extends RealmObject {
         mDate = Calendar.getInstance().getTime();
         mAmount = (bikeOwnerEmail == null || bikeOwnerEmail.equals(userEmail)) ? amount : amount * -1;
 
-        if (mAmount > 0) {
+        if (mAmount > 0 && bikeOwnerEmail == null) {
             mDescription = "Top Up";
-        } else if (mUserEmail.equals(bikeOwnerEmail)) {
+        } else if (!mUserEmail.equals(bikeOwnerEmail)) {
             mDescription = "Credit from Usage of " + bikeName;
         } else {
             mDescription = "Ended ride on " + bikeName;

@@ -28,7 +28,7 @@ public class Ride extends RealmObject {
     private String mUserEmail;
     private String mBikeId;
     private String mBikeName;
-    private double mPricePerHour;
+    private double mBikePricePerHour;
 
     public Ride() {
 
@@ -38,7 +38,7 @@ public class Ride extends RealmObject {
                  double startLongitude, double startLatitude, String endLocation,
                  Date endDate, double endLongitude, double endLatitude, Bitmap bitmap,
                  String userEmail, String bikeId, String bikeName,
-                 double pricePerHour) {
+                 double bikePricePerHour) {
         mId = id;
         mStartLocation = startLocation;
         mStartDate = startDate;
@@ -60,18 +60,18 @@ public class Ride extends RealmObject {
         mUserEmail = userEmail;
         mBikeId = bikeId;
         mBikeName = bikeName;
-        mPricePerHour = pricePerHour;
+        mBikePricePerHour = bikePricePerHour;
     }
 
     public Ride(int id, String startLocation, Date startDate,
                 double startLongitude, double startLatitude, Bitmap bitmap,
                 String userEmail, String bikeId, String bikeName,
-                double pricePerHour) {
+                double bikePricePerHour) {
         this(id, startLocation, startDate,
                 startLongitude, startLatitude, null,
                 null, -1, -1,
                 bitmap, userEmail, bikeId,
-                bikeName, pricePerHour);
+                bikeName, bikePricePerHour);
     }
 
     public int getId() {
@@ -170,7 +170,7 @@ public class Ride extends RealmObject {
         double hours = diff / 1000.0 / 60.0 / 60.0;
 
         // Multiply by rate
-        double amount = hours * mPricePerHour;
+        double amount = hours * mBikePricePerHour;
 
         // Adapted from https://stackoverflow.com/a/2808648
         BigDecimal bd = new BigDecimal(amount);
