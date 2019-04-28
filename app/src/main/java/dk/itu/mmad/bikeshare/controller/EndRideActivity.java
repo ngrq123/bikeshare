@@ -81,7 +81,7 @@ public class EndRideActivity extends AppCompatActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                     // https://www.mkyong.com/android/android-spinner-drop-down-list-example/
-                    mSelectedBikeId = ((Ride) adapterView.getItemAtPosition(i)).getBike().getId();
+                    mSelectedBikeId = ((Ride) adapterView.getItemAtPosition(i)).getBikeId();
                 }
 
                 @Override
@@ -133,26 +133,38 @@ public class EndRideActivity extends AppCompatActivity {
                                 ride.setEndLongitude(mLongitude);
                                 ride.setEndLatitude(mLatitude);
 
-                                ride.getBike().setInUse(false);
-                                ride.getBike().setLocation(endRide);
-                                ride.getBike().setLongitude(mLongitude);
-                                ride.getBike().setLatitude(mLatitude);
+                                bike.setInUse(false);
+                                bike.setLocation(endRide);
+                                bike.setLongitude(mLongitude);
+                                bike.setLatitude(mLatitude);
 
-                                bgRealm.insertOrUpdate(ride);
                                 bgRealm.insertOrUpdate(bike);
+                                bgRealm.insertOrUpdate(ride);
 
-                                User user = ride.getUser();
+                                User user = bgRealm.where(User.class)
+                                        .equalTo("mEmail", ride.getUserEmail())
+                                        .findFirst();
 
-                                if (!ride.getBike().getUserEmail().equals(user.getEmail())) {
+                                if (!bike.getUserEmail().equals(user.getEmail())) {
                                     // Add transaction and deduct balance
                                     user.deductBalance(ride.getAmount());
 
-                                    bgRealm.insert(new Transaction(user.getEmail(), ride.getAmount(), ride.getBike()));
-                                    bgRealm.insert(new Transaction(bike.getUserEmail(), ride.getAmount(), ride.getBike()));
+                                    // Add balance to bike owner
+                                    User bikeOwner = bgRealm.where(User.class)
+                                            .equalTo("mEmail", bike.getUserEmail())
+                                            .findFirst();
+                                    bikeOwner.addBalance(ride.getAmount());
+
+                                    // Update database
+                                    bgRealm.insert(new Transaction(user.getEmail(), ride.getAmount(), bikeOwner.getEmail(),
+                                            bike.getId(), bike.getName()));
+                                    bgRealm.insert(new Transaction(bikeOwner.getEmail(), ride.getAmount(), bikeOwner.getEmail(),
+                                            bike.getId(), bike.getName()));
                                     bgRealm.insertOrUpdate(user);
+                                    bgRealm.insertOrUpdate(bikeOwner);
                                 }
 
-                                mLastEndedStr = ride.getBike().getName() + " ended at " +
+                                mLastEndedStr = bike.getName() + " ended at " +
                                         ride.getEndLocation() + " on " + ride.getEndDate();
                             }
                         }, new Realm.Transaction.OnSuccess() {

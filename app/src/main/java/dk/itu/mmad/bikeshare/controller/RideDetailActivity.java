@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.io.File;
 
 import dk.itu.mmad.bikeshare.R;
+import dk.itu.mmad.bikeshare.model.Bike;
 import dk.itu.mmad.bikeshare.model.Ride;
 import io.realm.Realm;
 
@@ -61,7 +62,7 @@ public class RideDetailActivity extends AppCompatActivity {
                             .findFirst();
 
                     // Set texts
-                    mBikeName.setText(ride.getBike().getName());
+                    mBikeName.setText(ride.getBikeName());
                     mStartRide.setText(ride.getStartLocation());
                     mEndRide.setText(ride.getEndLocation());
                 }
@@ -98,7 +99,12 @@ public class RideDetailActivity extends AppCompatActivity {
                                 photoFile.delete();
                             }
 
-                            ride.getBike().setInUse(false);
+                            Bike bike = bgRealm.where(Bike.class)
+                                    .equalTo("mId", ride.getBikeId())
+                                    .findFirst();
+
+                            bike.setInUse(false);
+                            bgRealm.insertOrUpdate(bike);
                             ride.deleteFromRealm();
 
                             startActivity(intent);

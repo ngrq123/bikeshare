@@ -196,9 +196,13 @@ public class StartRideActivity extends AppCompatActivity {
                                 int rideId = (maxIdRide == null) ? 1 : (maxIdRide.getId() + 1);
 
                                 // Create Ride object, update bike and insert ride
-                                Ride ride  = new Ride(rideId, startRide, startDate, mLongitude, mLatitude, toBitmap(), user, bike);
-                                ride.getBike().setInUse(true);
+                                Ride ride  = new Ride(rideId, startRide, startDate,
+                                        mLongitude, mLatitude, toBitmap(),
+                                        user.getEmail(), bike.getId(), bike.getName(),
+                                        bike.getPricePerHr());
+                                bike.setInUse(true);
                                 bgRealm.insert(ride);
+                                bgRealm.insertOrUpdate(bike);
 
                                 mPhotoFile.delete();
                                 mLastAddedStr = ride.toString();

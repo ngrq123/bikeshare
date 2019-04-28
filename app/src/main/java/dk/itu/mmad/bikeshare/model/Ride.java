@@ -25,19 +25,20 @@ public class Ride extends RealmObject {
     private double mEndLongitude;
     private double mEndLatitude;
     private byte[] mPicture;
-    private User mUser;
     private String mUserEmail;
-    private Bike mBike;
     private String mBikeId;
+    private String mBikeName;
+    private double mPricePerHour;
 
     public Ride() {
 
     }
 
     private Ride(int id, String startLocation, Date startDate,
-                double startLongitude, double startLatitude, String endLocation,
-                Date endDate, double endLongitude, double endLatitude, Bitmap bitmap,
-                User user, Bike bike) {
+                 double startLongitude, double startLatitude, String endLocation,
+                 Date endDate, double endLongitude, double endLatitude, Bitmap bitmap,
+                 String userEmail, String bikeId, String bikeName,
+                 double pricePerHour) {
         mId = id;
         mStartLocation = startLocation;
         mStartDate = startDate;
@@ -56,19 +57,21 @@ public class Ride extends RealmObject {
             mPicture = blob.toByteArray();
         }
 
-        mUser = user;
-        mUserEmail = (user == null ? null : user.getEmail());
-        mBike = bike;
-        mBikeId = (bike == null ? null : bike.getId());
+        mUserEmail = userEmail;
+        mBikeId = bikeId;
+        mBikeName = bikeName;
+        mPricePerHour = pricePerHour;
     }
 
     public Ride(int id, String startLocation, Date startDate,
                 double startLongitude, double startLatitude, Bitmap bitmap,
-                User user, Bike bike) {
+                String userEmail, String bikeId, String bikeName,
+                double pricePerHour) {
         this(id, startLocation, startDate,
                 startLongitude, startLatitude, null,
                 null, -1, -1,
-                bitmap, user, bike);
+                bitmap, userEmail, bikeId,
+                bikeName, pricePerHour);
     }
 
     public int getId() {
@@ -127,16 +130,20 @@ public class Ride extends RealmObject {
         return BitmapFactory.decodeByteArray(mPicture, 0, mPicture.length);
     }
 
-    public User getUser() {
-        return mUser;
+    public String getUserEmail() {
+        return mUserEmail;
     }
 
-    public Bike getBike() {
-        return mBike;
+    public String getBikeId() {
+        return mBikeId;
+    }
+
+    public String getBikeName() {
+        return mBikeName;
     }
 
     public String toString() {
-        String rideStr = mBike.getName();
+        String rideStr = mBikeName;
 
         if (mStartLocation != null) {
             rideStr += " started at " + mStartLocation + " on " + mStartDate.toString();
@@ -163,7 +170,7 @@ public class Ride extends RealmObject {
         double hours = diff / 1000.0 / 60.0 / 60.0;
 
         // Multiply by rate
-        double amount = hours * mBike.getPricePerHr();
+        double amount = hours * mPricePerHour;
 
         // Adapted from https://stackoverflow.com/a/2808648
         BigDecimal bd = new BigDecimal(amount);

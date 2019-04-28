@@ -15,32 +15,30 @@ public class Transaction extends RealmObject {
     private Date mDate;
     private double mAmount;
     private String mDescription;
-    private Bike mBike;
 
     public Transaction() {
 
     }
 
-    public Transaction(String userEmail, double amount, Bike bike) {
+    public Transaction(String userEmail, double amount, String bikeOwnerEmail, String bikeId, String bikeName) {
         mUserEmail = userEmail;
         mDate = Calendar.getInstance().getTime();
-        mAmount = (bike == null || bike.getUserEmail().equals(userEmail)) ? amount : amount * -1;
-        mBike = bike;
+        mAmount = (bikeOwnerEmail == null || bikeOwnerEmail.equals(userEmail)) ? amount : amount * -1;
 
-        if (bike == null) {
+        if (mAmount > 0) {
             mDescription = "Top Up";
-        } else if (mUserEmail.equals(bike.getUserEmail())) {
-            mDescription = "Credit from Usage of " + bike.getName();
+        } else if (mUserEmail.equals(bikeOwnerEmail)) {
+            mDescription = "Credit from Usage of " + bikeName;
         } else {
-            mDescription = "Ended ride on " + bike.getName();
+            mDescription = "Ended ride on " + bikeName;
         }
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
-        mId = mUserEmail.substring(0, mUserEmail.indexOf("@")) + (bike == null ? "" : bike.getId()) + simpleDateFormat.format(mDate);
+        mId = mUserEmail.substring(0, mUserEmail.indexOf("@")) + bikeId + simpleDateFormat.format(mDate);
     }
 
     public Transaction(String userEmail, double amount) {
-        this(userEmail, amount, null);
+        this(userEmail, amount, null, null, null);
     }
 
     public String getId() {

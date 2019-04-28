@@ -52,7 +52,7 @@ public class RideHolder extends RecyclerView.ViewHolder implements View.OnTouchL
     public void bind(Ride ride) {
         mRide = ride;
 
-        mBikeNameView.setText(ride.getBike().getName());
+        mBikeNameView.setText(ride.getBikeName());
 
         String startRideText = "Start: " + ride.getStartLocation();
         if (ride.isStartLocationKnown()) {

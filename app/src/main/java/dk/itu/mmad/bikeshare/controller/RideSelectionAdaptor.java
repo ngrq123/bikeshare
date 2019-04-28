@@ -24,7 +24,7 @@ public class RideSelectionAdaptor extends RealmBaseAdapter<Ride> {
         // https://stackoverflow.com/a/30663821
         View viewToReturn = View.inflate(parent.getContext(), R.layout.support_simple_spinner_dropdown_item, null);
         TextView bikenameView = viewToReturn.findViewById(android.R.id.text1);
-        bikenameView.setText(getItem(i).getBike().getName() + " (" + getItem(i).getBike().getId() + ")");
+        bikenameView.setText(getItem(i).getBikeName() + " (" + getItem(i).getBikeId() + ")");
         return viewToReturn;
     }
 }
